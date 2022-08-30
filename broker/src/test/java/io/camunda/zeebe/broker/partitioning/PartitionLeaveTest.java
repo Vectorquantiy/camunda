@@ -19,6 +19,7 @@ import io.camunda.zeebe.broker.test.TestBrokerClientFactory;
 import io.camunda.zeebe.broker.test.TestClusterFactory;
 import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.test.util.asserts.TopologyAssert;
+import io.opentelemetry.api.OpenTelemetry;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -219,6 +220,6 @@ final class PartitionLeaveTest {
     final var systemContext =
         new SystemContext(brokerCfg, actorScheduler, atomixCluster, brokerClient);
 
-    return new Broker(systemContext, new SpringBrokerBridge(), List.of());
+    return new Broker(systemContext, new SpringBrokerBridge(), List.of(), OpenTelemetry.noop());
   }
 }

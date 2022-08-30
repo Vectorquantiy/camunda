@@ -23,6 +23,7 @@ import io.camunda.zeebe.snapshots.ReceivableSnapshotStore;
 import io.camunda.zeebe.snapshots.ReceivedSnapshot;
 import io.camunda.zeebe.snapshots.SnapshotException.SnapshotAlreadyExistsException;
 import io.camunda.zeebe.snapshots.SnapshotId;
+import io.opentelemetry.api.OpenTelemetry;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,7 +78,7 @@ public class TestSnapshotStore implements ReceivableSnapshotStore {
   @Override
   public ActorFuture<Void> purgePendingSnapshots() {
     receivedSnapshots.clear();
-    return CompletableActorFuture.completed(null);
+    return CompletableActorFuture.completed(null, OpenTelemetry.noop());
   }
 
   @Override
@@ -120,7 +121,7 @@ public class TestSnapshotStore implements ReceivableSnapshotStore {
         .orElse("")
         .equals(snapshotId)) {
       CompletableActorFuture.completedExceptionally(
-          new SnapshotAlreadyExistsException("Snapshot with this ID is already persisted"));
+          new SnapshotAlreadyExistsException("Snapshot with this ID is already persisted"), OpenTelemetry.noop());
     }
 
     final var newSnapshot = new InMemorySnapshot(this, snapshotId);

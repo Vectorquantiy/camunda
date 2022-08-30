@@ -19,6 +19,7 @@ import io.camunda.zeebe.transport.stream.impl.messages.StreamTopics;
 import io.camunda.zeebe.util.buffer.BufferReader;
 import io.camunda.zeebe.util.buffer.BufferUtil;
 import io.camunda.zeebe.util.buffer.BufferWriter;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.Objects;
 import java.util.UUID;
 import org.agrona.CloseHelper;

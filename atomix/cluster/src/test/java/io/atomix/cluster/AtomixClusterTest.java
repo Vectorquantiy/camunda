@@ -23,6 +23,8 @@ import static org.junit.Assert.fail;
 
 import io.atomix.cluster.discovery.BootstrapDiscoveryProvider;
 import io.atomix.utils.net.Address;
+import io.opentelemetry.api.OpenTelemetry;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -85,7 +87,7 @@ public class AtomixClusterTest {
             Node.builder().withId("baz").withAddress(Address.from("localhost:5002")).build());
 
     final AtomixCluster cluster1 =
-        AtomixCluster.builder()
+        AtomixCluster.builder(OpenTelemetry.noop())
             .withMemberId("foo")
             .withHost("localhost")
             .withPort(5000)
@@ -97,7 +99,7 @@ public class AtomixClusterTest {
     assertEquals("foo", cluster1.getMembershipService().getLocalMember().id().id());
 
     final AtomixCluster cluster2 =
-        AtomixCluster.builder()
+        AtomixCluster.builder(OpenTelemetry.noop())
             .withMemberId("bar")
             .withHost("localhost")
             .withPort(5001)
@@ -109,7 +111,7 @@ public class AtomixClusterTest {
     assertEquals("bar", cluster2.getMembershipService().getLocalMember().id().id());
 
     final AtomixCluster cluster3 =
-        AtomixCluster.builder()
+        AtomixCluster.builder(OpenTelemetry.noop())
             .withMemberId("baz")
             .withHost("localhost")
             .withPort(5002)

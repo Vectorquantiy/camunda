@@ -17,6 +17,7 @@ import io.atomix.utils.net.Address;
 import io.camunda.zeebe.util.CloseableSilently;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.opentelemetry.api.OpenTelemetry;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class RemoteClientConnectionTest {
     final ChannelFuture channelFuture = mock(ChannelFuture.class);
     when(channel.writeAndFlush(any())).thenReturn(channelFuture);
     simpleMetrics = new SimpleMessagingMetrics();
-    remoteClientConnection = new RemoteClientConnection(simpleMetrics, channel);
+    remoteClientConnection = new RemoteClientConnection(simpleMetrics, channel, OpenTelemetry.noop());
   }
 
   @Test
@@ -49,7 +50,7 @@ public class RemoteClientConnectionTest {
 
     // when
     remoteClientConnection.sendAsync(
-        new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes()));
+        new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes(), new HashMap<>()));
 
     // then
     final String expectedKey = simpleMetrics.computeKey(toAddress.toString(), "subj");
@@ -67,7 +68,7 @@ public class RemoteClientConnectionTest {
 
     // when
     remoteClientConnection.sendAndReceive(
-        new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes()));
+        new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes(), new HashMap<>()));
 
     // then
     final String expectedKey = simpleMetrics.computeKey(toAddress.toString(), "subj");
@@ -84,7 +85,7 @@ public class RemoteClientConnectionTest {
     // given
     final var responseFuture =
         remoteClientConnection.sendAndReceive(
-            new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes()));
+            new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes(), new HashMap<>()));
 
     // when
     responseFuture.complete("complete".getBytes());
@@ -106,7 +107,7 @@ public class RemoteClientConnectionTest {
     // given
     final var responseFuture =
         remoteClientConnection.sendAndReceive(
-            new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes()));
+            new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes(), new HashMap<>()));
 
     // when
     responseFuture.completeExceptionally(new RuntimeException());
@@ -128,7 +129,7 @@ public class RemoteClientConnectionTest {
     // given
     final var responseFuture =
         remoteClientConnection.sendAndReceive(
-            new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes()));
+            new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes(), new HashMap<>()));
 
     // when
     remoteClientConnection.close();

@@ -25,6 +25,7 @@ import io.camunda.zeebe.scheduler.testing.ActorSchedulerRule;
 import io.camunda.zeebe.stream.api.EventFilter;
 import io.camunda.zeebe.stream.impl.SkipPositionsFilter;
 import io.camunda.zeebe.test.util.AutoCloseableRule;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
@@ -114,7 +115,7 @@ public final class ExporterRule implements TestRule {
             .descriptors(exporterDescriptors)
             .positionsToSkipFilter(positionsToSkipFilter);
 
-    director = new ExporterDirector(context, false);
+    director = new ExporterDirector(context, false, OpenTelemetry.noop());
     director.startAsync(actorSchedulerRule.get()).join();
   }
 

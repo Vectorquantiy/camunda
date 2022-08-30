@@ -22,6 +22,8 @@ import io.camunda.zeebe.transport.stream.impl.messages.MessageUtil;
 import io.camunda.zeebe.transport.stream.impl.messages.StreamTopics;
 import io.camunda.zeebe.util.buffer.BufferUtil;
 import io.camunda.zeebe.util.buffer.BufferWriter;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
@@ -41,7 +43,9 @@ public final class ClientStreamServiceImpl<M extends BufferWriter> extends Actor
   private final ClientStreamApiHandler apiHandler;
 
   public ClientStreamServiceImpl(
-      final ClusterCommunicationService communicationService, final ClientStreamMetrics metrics) {
+      final ClusterCommunicationService communicationService, final ClientStreamMetrics metrics,
+      final OpenTelemetry openTelemetry) {
+    super(openTelemetry);
     this.communicationService = communicationService;
     registry = new ClientStreamRegistry<>(metrics);
 
@@ -49,7 +53,7 @@ public final class ClientStreamServiceImpl<M extends BufferWriter> extends Actor
     // ClientStream objects.
     clientStreamManager =
         new ClientStreamManager<>(
-            registry, new ClientStreamRequestManager<>(communicationService, actor), metrics);
+            registry, new ClientStreamRequestManager<>(communicationService, actor), metrics, openTelemetry);
     apiHandler = new ClientStreamApiHandler(clientStreamManager, actor);
   }
 

@@ -18,6 +18,8 @@ import io.camunda.zeebe.transport.stream.impl.messages.PushStreamRequest;
 import io.camunda.zeebe.transport.stream.impl.messages.StreamTopics;
 import io.camunda.zeebe.util.buffer.BufferUtil;
 import io.camunda.zeebe.util.buffer.BufferWriter;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,6 +54,7 @@ public final class RemoteStreamerImpl<M, P extends BufferWriter> extends Actor
       final ImmutableStreamRegistry<M> registry,
       final RemoteStreamErrorHandler<P> errorHandler,
       final RemoteStreamMetrics metrics) {
+    super(GlobalOpenTelemetry.get());
     this.transport = Objects.requireNonNull(transport, "must specify a network transport");
     this.registry = Objects.requireNonNull(registry, "must specify a job stream registry");
     this.errorHandler = Objects.requireNonNull(errorHandler, "must specify an error handler");

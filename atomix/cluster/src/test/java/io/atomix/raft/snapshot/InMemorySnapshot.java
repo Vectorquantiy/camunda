@@ -26,6 +26,7 @@ import io.camunda.zeebe.snapshots.SnapshotMetadata;
 import io.camunda.zeebe.snapshots.SnapshotReservation;
 import io.camunda.zeebe.util.StringUtil;
 import io.camunda.zeebe.util.buffer.BufferUtil;
+import io.opentelemetry.api.OpenTelemetry;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.NavigableMap;
@@ -196,19 +197,19 @@ public final class InMemorySnapshot implements PersistedSnapshot, ReceivedSnapsh
   @Override
   public ActorFuture<Void> apply(final SnapshotChunk chunk) {
     chunks.put(chunk.getChunkName(), StringUtil.fromBytes(chunk.getContent()));
-    return CompletableActorFuture.completed(null);
+    return CompletableActorFuture.completed(null, OpenTelemetry.noop());
   }
 
   @Override
   public ActorFuture<Void> abort() {
-    return CompletableActorFuture.completed(null);
+    return CompletableActorFuture.completed(null, OpenTelemetry.noop());
   }
 
   @Override
   public ActorFuture<PersistedSnapshot> persist() {
     testSnapshotStore.newSnapshot(this);
     checksum = checksumCalculator.getValue();
-    return CompletableActorFuture.completed(this);
+    return CompletableActorFuture.completed(this, OpenTelemetry.noop());
   }
 
   @Override

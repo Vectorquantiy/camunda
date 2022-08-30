@@ -21,6 +21,7 @@ import io.camunda.zeebe.topology.state.MemberState;
 import io.camunda.zeebe.topology.state.PartitionState;
 import io.camunda.zeebe.topology.state.PartitionState.State;
 import io.camunda.zeebe.util.Either;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -99,7 +100,7 @@ final class PartitionLeaveApplierTest {
     // given
     when(partitionChangeExecutor.leave(anyInt()))
         .thenReturn(
-            CompletableActorFuture.completedExceptionally(new RuntimeException("Expected")));
+            CompletableActorFuture.completedExceptionally(new RuntimeException("Expected"), OpenTelemetry.noop()));
 
     // when
     final var joinFuture = partitionLeaveApplier.apply();

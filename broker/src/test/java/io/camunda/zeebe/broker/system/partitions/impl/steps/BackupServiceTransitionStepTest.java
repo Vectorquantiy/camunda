@@ -27,6 +27,7 @@ import io.camunda.zeebe.broker.system.partitions.impl.steps.PartitionTransitionT
 import io.camunda.zeebe.broker.system.partitions.impl.steps.PartitionTransitionTestArgumentProviders.TransitionsThatShouldInstallService;
 import io.camunda.zeebe.scheduler.ActorSchedulingService;
 import io.camunda.zeebe.scheduler.testing.TestConcurrencyControl;
+import io.opentelemetry.api.OpenTelemetry;
 import java.nio.file.Path;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,7 +81,7 @@ class BackupServiceTransitionStepTest {
         .when(backupManagerPreviousRole.closeAsync())
         .thenReturn(TEST_CONCURRENCY_CONTROL.completedFuture(null));
 
-    step = new BackupServiceTransitionStep();
+    step = new BackupServiceTransitionStep(OpenTelemetry.noop());
   }
 
   @ParameterizedTest

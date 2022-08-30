@@ -25,6 +25,7 @@ import io.camunda.zeebe.util.VersionUtil;
 import io.camunda.zeebe.util.exception.UncheckedExecutionException;
 import io.camunda.zeebe.util.jar.ExternalJarLoadException;
 import io.netty.util.NetUtil;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -44,16 +45,20 @@ public final class Broker implements AutoCloseable {
   private final BrokerStartupActor brokerStartupActor;
   private BrokerContext brokerContext;
 
+  private final OpenTelemetry openTelemetry;
+
   // TODO make Broker class itself the actor
-  public Broker(final SystemContext systemContext, final SpringBrokerBridge springBrokerBridge) {
-    this(systemContext, springBrokerBridge, Collections.emptyList());
+  public Broker(final SystemContext systemContext, final SpringBrokerBridge springBrokerBridge,
+      final OpenTelemetry openTelemetry) {
+    this(systemContext, springBrokerBridge, Collections.emptyList(), openTelemetry);
   }
 
   public Broker(
       final SystemContext systemContext,
       final SpringBrokerBridge springBrokerBridge,
-      final List<PartitionListener> additionalPartitionListeners) {
+      final List<PartitionListener> additionalPartitionListeners, final OpenTelemetry openTelemetry) {
     this.systemContext = systemContext;
+    this.openTelemetry = openTelemetry;
 
     final ActorScheduler scheduler = this.systemContext.getScheduler();
     final BrokerInfo localBroker = createBrokerInfo(getConfig());
@@ -72,7 +77,8 @@ public final class Broker implements AutoCloseable {
             new ClusterServicesImpl(systemContext.getCluster()),
             systemContext.getBrokerClient(),
             additionalPartitionListeners,
-            systemContext.getShutdownTimeout());
+            systemContext.getShutdownTimeout(),
+            openTelemetry);
 
     brokerStartupActor = new BrokerStartupActor(startupContext);
     scheduler.submitActor(brokerStartupActor);
@@ -201,6 +207,7 @@ public final class Broker implements AutoCloseable {
     private final int nodeId;
 
     private BrokerStartupActor(final BrokerStartupContextImpl startupContext) {
+      super(startupContext.getOpenTelemetryApi());
       nodeId = startupContext.getBrokerInfo().getNodeId();
       startupContext.setConcurrencyControl(actor);
       brokerStartupProcess = new BrokerStartupProcess(startupContext);

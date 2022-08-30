@@ -23,6 +23,7 @@ import io.camunda.zeebe.logstreams.log.LogStream;
 import io.camunda.zeebe.scheduler.ActorScheduler;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
+import io.opentelemetry.api.OpenTelemetry;
 import java.io.File;
 import java.time.Duration;
 import java.util.Collections;
@@ -62,7 +63,7 @@ public final class SimpleBrokerStartTest {
                       mock(ActorScheduler.class),
                       mock(AtomixCluster.class),
                       mock(BrokerClient.class));
-              new Broker(systemContext, TEST_SPRING_BROKER_BRIDGE);
+              new Broker(systemContext, TEST_SPRING_BROKER_BRIDGE, OpenTelemetry.noop());
             });
 
     // then
@@ -108,7 +109,7 @@ public final class SimpleBrokerStartTest {
           }
         };
     final var broker =
-        new Broker(systemContext, TEST_SPRING_BROKER_BRIDGE, Collections.singletonList(listener));
+        new Broker(systemContext, TEST_SPRING_BROKER_BRIDGE, Collections.singletonList(listener), OpenTelemetry.noop());
 
     // when
     broker.start().join();

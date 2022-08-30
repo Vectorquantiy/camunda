@@ -15,6 +15,7 @@ import io.camunda.zeebe.transport.stream.api.ClientStreamMetrics;
 import io.camunda.zeebe.transport.stream.api.NoSuchStreamException;
 import io.camunda.zeebe.transport.stream.impl.messages.PushStreamRequest;
 import io.camunda.zeebe.util.buffer.BufferWriter;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.HashSet;
 import java.util.Set;
 import org.agrona.DirectBuffer;
@@ -28,15 +29,18 @@ final class ClientStreamManager<M extends BufferWriter> {
   private final ClientStreamRequestManager<M> requestManager;
   private final ClientStreamMetrics metrics;
   private final ClientStreamPusher streamPusher;
+  private final OpenTelemetry openTelemetry;
 
   ClientStreamManager(
       final ClientStreamRegistry<M> registry,
       final ClientStreamRequestManager<M> requestManager,
-      final ClientStreamMetrics metrics) {
+      final ClientStreamMetrics metrics,
+      final OpenTelemetry openTelemetry) {
     this.registry = registry;
     this.requestManager = requestManager;
     this.metrics = metrics;
-    streamPusher = new ClientStreamPusher(metrics);
+    streamPusher = new ClientStreamPusher(metrics, openTelemetry);
+    this.openTelemetry = openTelemetry;
   }
 
   /**

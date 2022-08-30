@@ -21,6 +21,7 @@ import io.camunda.zeebe.scheduler.clock.ActorClock;
 import io.camunda.zeebe.scheduler.clock.ControlledActorClock;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -89,6 +90,7 @@ public final class ControlledActorSchedulerRule extends ExternalResource {
     private final Callable<T> callable;
 
     CallingActor(final ActorFuture<T> future, final Callable<T> callable) {
+      super(OpenTelemetry.noop());
       this.future = future;
       this.callable = callable;
     }

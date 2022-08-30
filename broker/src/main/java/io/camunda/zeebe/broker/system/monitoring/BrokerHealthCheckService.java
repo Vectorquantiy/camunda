@@ -18,6 +18,7 @@ import io.camunda.zeebe.scheduler.health.CriticalComponentsHealthMonitor;
 import io.camunda.zeebe.util.health.HealthMonitor;
 import io.camunda.zeebe.util.health.HealthMonitorable;
 import io.camunda.zeebe.util.health.HealthStatus;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -99,6 +100,7 @@ public final class BrokerHealthCheckService extends Actor implements PartitionRa
   private final MemberId nodeId;
 
   public BrokerHealthCheckService(final BrokerInfo localBroker) {
+    super(GlobalOpenTelemetry.get());
     nodeId = MemberId.from(String.valueOf(localBroker.getNodeId()));
     healthMonitor = new CriticalComponentsHealthMonitor("Broker-" + nodeId, actor, LOG);
   }

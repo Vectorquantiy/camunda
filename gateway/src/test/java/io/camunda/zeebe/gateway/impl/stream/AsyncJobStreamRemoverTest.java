@@ -17,6 +17,7 @@ import io.camunda.zeebe.transport.stream.api.ClientStreamConsumer;
 import io.camunda.zeebe.transport.stream.api.ClientStreamId;
 import io.camunda.zeebe.transport.stream.api.ClientStreamer;
 import io.camunda.zeebe.util.buffer.BufferUtil;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -71,7 +72,7 @@ final class AsyncJobStreamRemoverTest {
     @Override
     public ActorFuture<Void> remove(final ClientStreamId streamId) {
       if (consumers.remove(streamId) == null) {
-        return CompletableActorFuture.completedExceptionally(new NoSuchElementException());
+        return CompletableActorFuture.completedExceptionally(new NoSuchElementException(), OpenTelemetry.noop());
       }
 
       return CompletableActorFuture.completed(null);

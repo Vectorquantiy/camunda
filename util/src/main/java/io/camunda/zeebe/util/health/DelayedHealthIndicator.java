@@ -17,7 +17,6 @@ import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Health.Builder;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.actuate.health.Status;
-import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * Wrapper for a health indicator that adds time tolerance to the underlying health indicator. When
@@ -63,7 +62,7 @@ public class DelayedHealthIndicator implements HealthIndicator {
     this(originalHealthIndicator, maxDowntime, System::currentTimeMillis);
   }
 
-  @Scheduled(fixedDelay = 5000)
+  //  @Scheduled(fixedDelay = 5000)
   public void checkHealth() {
     lastHealthStatus = originalHealthIndicator.health();
 

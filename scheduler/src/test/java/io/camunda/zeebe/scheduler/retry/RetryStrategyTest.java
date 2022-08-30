@@ -18,6 +18,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.TimeUnit;
+import io.camunda.zeebe.scheduler.testing.ControlledActorSchedulerRule;
+import io.opentelemetry.api.OpenTelemetry;
+import java.lang.reflect.Constructor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -220,6 +223,11 @@ final class RetryStrategyTest {
   }
 
   private static final class ControllableActor extends Actor {
+
+    private ControllableActor() {
+      super(OpenTelemetry.noop());
+    }
+
     public ActorControl getActor() {
       return actor;
     }

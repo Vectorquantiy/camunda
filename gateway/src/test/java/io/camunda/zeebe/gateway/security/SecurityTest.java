@@ -25,6 +25,7 @@ import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.test.util.asserts.SslAssert;
 import io.camunda.zeebe.test.util.socket.SocketUtil;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
+import io.opentelemetry.api.OpenTelemetry;
 import java.io.File;
 import java.io.IOException;
 import org.agrona.CloseHelper;
@@ -155,7 +156,7 @@ final class SecurityTest {
   private Gateway buildGateway(final GatewayCfg gatewayCfg) {
     final var clusterAddress = SocketUtil.getNextAddress();
     atomix =
-        AtomixCluster.builder()
+        AtomixCluster.builder(OpenTelemetry.noop())
             .withAddress(Address.from(clusterAddress.getHostName(), clusterAddress.getPort()))
             .build();
     actorScheduler = ActorScheduler.newActorScheduler().build();

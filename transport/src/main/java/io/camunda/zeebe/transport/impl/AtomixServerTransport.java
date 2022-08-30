@@ -14,6 +14,7 @@ import io.camunda.zeebe.transport.RequestHandler;
 import io.camunda.zeebe.transport.RequestType;
 import io.camunda.zeebe.transport.ServerResponse;
 import io.camunda.zeebe.transport.ServerTransport;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import org.agrona.collections.Int2ObjectHashMap;
@@ -39,7 +40,8 @@ public class AtomixServerTransport extends Actor implements ServerTransport {
 
   private final IdGenerator idGenerator;
 
-  public AtomixServerTransport(final MessagingService messagingService, final int nodeId) {
+  public AtomixServerTransport(final MessagingService messagingService, final int nodeId, final OpenTelemetry openTelemetry) {
+    super(openTelemetry);
     this.messagingService = messagingService;
     partitionsRequestMap = new Int2ObjectHashMap<>();
     this.idGenerator =
@@ -49,7 +51,7 @@ public class AtomixServerTransport extends Actor implements ServerTransport {
             nodeId,
             TIMESTAMP_OFFSET_2023,
             SystemEpochClock.INSTANCE);
-  }
+    }
 
   @Override
   public String getName() {

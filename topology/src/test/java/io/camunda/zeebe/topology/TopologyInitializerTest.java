@@ -29,6 +29,7 @@ import io.camunda.zeebe.topology.serializer.ProtoBufSerializer;
 import io.camunda.zeebe.topology.state.ClusterTopology;
 import io.camunda.zeebe.topology.state.MemberState;
 import io.camunda.zeebe.topology.state.PartitionState;
+import io.opentelemetry.api.OpenTelemetry;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -360,7 +361,7 @@ final class TopologyInitializerTest {
       final TopologyInitializer failingInitializer =
           () ->
               CompletableActorFuture.completedExceptionally(
-                  new PersistedTopologyIsBroken(topologyFile, null));
+                  new PersistedTopologyIsBroken(topologyFile, null), OpenTelemetry.noop());
       final var recoveringInitializer =
           failingInitializer.recover(PersistedTopologyIsBroken.class, recovery);
 
@@ -400,7 +401,7 @@ final class TopologyInitializerTest {
       final TopologyInitializer recoveryInitializer =
           () ->
               CompletableActorFuture.completedExceptionally(
-                  new RuntimeException("shouldn't happen"));
+                  new RuntimeException("shouldn't happen"), OpenTelemetry.noop());
 
       // when
       final var chainedInitializer =
@@ -418,7 +419,7 @@ final class TopologyInitializerTest {
       final TopologyInitializer failingInitializer =
           () ->
               CompletableActorFuture.completedExceptionally(
-                  new PersistedTopologyIsBroken(topologyFile, null));
+                  new PersistedTopologyIsBroken(topologyFile, null), OpenTelemetry.noop());
 
       final TopologyInitializer unsuccessfulRecovery =
           () -> CompletableActorFuture.completed(ClusterTopology.uninitialized());

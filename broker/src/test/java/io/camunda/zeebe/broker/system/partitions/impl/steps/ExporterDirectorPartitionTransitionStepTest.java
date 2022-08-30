@@ -25,6 +25,7 @@ import io.camunda.zeebe.logstreams.log.LogStream;
 import io.camunda.zeebe.scheduler.ActorSchedulingService;
 import io.camunda.zeebe.scheduler.testing.TestActorFuture;
 import io.camunda.zeebe.util.health.HealthMonitor;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -55,7 +56,7 @@ class ExporterDirectorPartitionTransitionStepTest {
     when(exporterDirectorFromPrevRole.closeAsync())
         .thenReturn(TestActorFuture.completedFuture(null));
 
-    step = new ExporterDirectorPartitionTransitionStep();
+    step = new ExporterDirectorPartitionTransitionStep(OpenTelemetry.noop());
   }
 
   @ParameterizedTest

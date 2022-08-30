@@ -31,6 +31,7 @@ import io.camunda.zeebe.util.exception.UnrecoverableException;
 import io.camunda.zeebe.util.health.FailureListener;
 import io.camunda.zeebe.util.health.HealthMonitorable;
 import io.camunda.zeebe.util.health.HealthReport;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -114,6 +115,7 @@ public class StreamProcessor extends Actor implements HealthMonitorable, LogReco
   private AsyncProcessingScheduleServiceActor asyncActor;
 
   protected StreamProcessor(final StreamProcessorBuilder processorBuilder) {
+    super(GlobalOpenTelemetry.get());
     actorSchedulingService = processorBuilder.getActorSchedulingService();
     lifecycleAwareListeners = new ArrayList<>(processorBuilder.getLifecycleListeners());
     zeebeDb = processorBuilder.getZeebeDb();
@@ -582,6 +584,7 @@ public class StreamProcessor extends Actor implements HealthMonitorable, LogReco
 
     public AsyncProcessingScheduleServiceActor(
         final ProcessingScheduleServiceImpl scheduleService, final int partitionId) {
+      super(GlobalOpenTelemetry.get());
       this.scheduleService = scheduleService;
       asyncScheduleActorName = buildActorName("AsyncProcessingScheduleActor", partitionId);
       this.partitionId = partitionId;

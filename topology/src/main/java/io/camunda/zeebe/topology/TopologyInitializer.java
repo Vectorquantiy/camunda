@@ -18,6 +18,7 @@ import io.camunda.zeebe.topology.TopologyInitializer.InitializerError.PersistedT
 import io.camunda.zeebe.topology.TopologyUpdateNotifier.TopologyUpdateListener;
 import io.camunda.zeebe.topology.serializer.ClusterTopologySerializer;
 import io.camunda.zeebe.topology.state.ClusterTopology;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
@@ -143,7 +144,7 @@ public interface TopologyInitializer {
         return CompletableActorFuture.completed(persistedTopology);
       } catch (final Exception e) {
         return CompletableActorFuture.completedExceptionally(
-            new PersistedTopologyIsBroken(topologyFile, e));
+            new PersistedTopologyIsBroken(topologyFile, e), GlobalOpenTelemetry.get());
       }
     }
   }
@@ -313,7 +314,7 @@ public interface TopologyInitializer {
         LOGGER.debug("Generated cluster topology from provided configuration. {}", topology);
         return CompletableActorFuture.completed(topology);
       } catch (final Exception e) {
-        return CompletableActorFuture.completedExceptionally(e);
+        return CompletableActorFuture.completedExceptionally(e, GlobalOpenTelemetry.get());
       }
     }
   }

@@ -58,6 +58,7 @@ import io.camunda.zeebe.stream.api.InterPartitionCommandSender;
 import io.camunda.zeebe.transport.impl.AtomixServerTransport;
 import io.camunda.zeebe.util.FeatureFlags;
 import io.camunda.zeebe.util.FileUtil;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
@@ -73,16 +74,16 @@ public final class ZeebePartitionFactory {
       List.of(
           new LogStoragePartitionTransitionStep(),
           new LogStreamPartitionTransitionStep(),
-          new ZeebeDbPartitionTransitionStep(),
-          new MigrationTransitionStep(),
-          new QueryServicePartitionTransitionStep(),
+          new ZeebeDbPartitionTransitionStep(GlobalOpenTelemetry.get()),
+          new MigrationTransitionStep(GlobalOpenTelemetry.get()),
+          new QueryServicePartitionTransitionStep(GlobalOpenTelemetry.get()),
           new BackupStoreTransitionStep(),
-          new BackupServiceTransitionStep(),
+          new BackupServiceTransitionStep(GlobalOpenTelemetry.get()),
           new InterPartitionCommandServiceStep(),
           new StreamProcessorTransitionStep(),
           new CommandApiServiceTransitionStep(),
           new SnapshotDirectorPartitionTransitionStep(),
-          new ExporterDirectorPartitionTransitionStep(),
+          new ExporterDirectorPartitionTransitionStep(GlobalOpenTelemetry.get()),
           new BackupApiRequestHandlerStep(),
           new AdminApiRequestHandlerStep());
 

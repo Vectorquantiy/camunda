@@ -33,6 +33,7 @@ import io.camunda.zeebe.topology.gossip.ClusterTopologyGossiperConfig;
 import io.camunda.zeebe.topology.serializer.ProtoBufSerializer;
 import io.camunda.zeebe.topology.state.ClusterTopology;
 import io.camunda.zeebe.util.FileUtil;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
@@ -70,8 +71,8 @@ public final class ClusterTopologyManagerService implements TopologyUpdateNotifi
     topologyFile = dataRootDirectory.resolve(TOPOLOGY_FILE_NAME);
     persistedClusterTopology =
         PersistedClusterTopology.ofFile(topologyFile, new ProtoBufSerializer());
-    gossipActor = new Actor() {};
-    managerActor = new Actor() {};
+    gossipActor = new Actor(GlobalOpenTelemetry.get()) {};
+    managerActor = new Actor(GlobalOpenTelemetry.get()) {};
     clusterTopologyManager =
         new ClusterTopologyManagerImpl(managerActor, localMemberId, persistedClusterTopology);
     clusterTopologyGossiper =

@@ -13,6 +13,7 @@ import io.atomix.utils.Version;
 import io.camunda.zeebe.broker.clustering.ClusterConfigFactory;
 import io.camunda.zeebe.broker.shared.BrokerConfiguration;
 import io.camunda.zeebe.util.VersionUtil;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,6 +27,6 @@ public final class BrokerClusterConfiguration {
 
   @Bean(destroyMethod = "stop")
   public AtomixCluster atomixCluster(final ClusterConfig config) {
-    return new AtomixCluster(config, Version.from(VersionUtil.getVersion()));
+    return new AtomixCluster(config, Version.from(VersionUtil.getVersion()), GlobalOpenTelemetry.get());
   }
 }

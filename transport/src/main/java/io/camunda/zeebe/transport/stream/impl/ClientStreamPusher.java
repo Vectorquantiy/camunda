@@ -15,6 +15,7 @@ import io.camunda.zeebe.transport.stream.api.NoSuchStreamException;
 import io.camunda.zeebe.transport.stream.api.StreamExhaustedException;
 import io.camunda.zeebe.transport.stream.impl.messages.ErrorResponse;
 import io.camunda.zeebe.util.logging.ThrottledLogger;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,9 +37,11 @@ final class ClientStreamPusher {
       new ThrottledLogger(LOGGER, Duration.ofSeconds(1));
 
   private final ClientStreamMetrics metrics;
+  private final OpenTelemetry openTelemetry;
 
-  ClientStreamPusher(final ClientStreamMetrics metrics) {
+  ClientStreamPusher(final ClientStreamMetrics metrics, final OpenTelemetry openTelemetry) {
     this.metrics = metrics;
+    this.openTelemetry = openTelemetry;
   }
 
   /**
@@ -108,7 +111,7 @@ final class ClientStreamPusher {
     try {
       return stream.clientStreamConsumer().push(payload);
     } catch (final Exception e) {
-      return CompletableActorFuture.completedExceptionally(e);
+      return CompletableActorFuture.completedExceptionally(e, openTelemetry);
     }
   }
 

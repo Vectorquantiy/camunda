@@ -36,6 +36,7 @@ import io.camunda.zeebe.scheduler.startup.StartupProcessShutdownException;
 import io.camunda.zeebe.topology.changes.PartitionChangeExecutor;
 import io.camunda.zeebe.transport.impl.AtomixServerTransport;
 import io.camunda.zeebe.util.health.HealthStatus;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -63,6 +64,7 @@ public final class PartitionManagerImpl implements PartitionManager, PartitionCh
   private final BrokerCfg brokerCfg;
   private final ZeebePartitionFactory zeebePartitionFactory;
   private final RaftPartitionFactory raftPartitionFactory;
+  private final OpenTelemetry openTelemetry;
 
   public PartitionManagerImpl(
       final ConcurrencyControl concurrencyControl,
@@ -78,12 +80,13 @@ public final class PartitionManagerImpl implements PartitionManager, PartitionCh
       final ExporterRepository exporterRepository,
       final AtomixServerTransport gatewayBrokerTransport,
       final JobStreamer jobStreamer,
-      final PartitionDistribution partitionDistribution) {
+      final PartitionDistribution partitionDistribution, final OpenTelemetry openTelemetry) {
     this.brokerCfg = brokerCfg;
     this.concurrencyControl = concurrencyControl;
     this.actorSchedulingService = actorSchedulingService;
     this.healthCheckService = healthCheckService;
     this.diskSpaceUsageMonitor = diskSpaceUsageMonitor;
+    this.openTelemetry = openTelemetry;
     final var featureFlags = brokerCfg.getExperimental().getFeatures().toFeatureFlags();
     this.partitionDistribution = partitionDistribution;
     // TODO: Do this as a separate step before starting the partition manager

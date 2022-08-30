@@ -18,6 +18,7 @@ import io.camunda.zeebe.transport.stream.impl.messages.StreamTopics;
 import io.camunda.zeebe.util.ExponentialBackoff;
 import io.camunda.zeebe.util.VisibleForTesting;
 import io.camunda.zeebe.util.buffer.BufferUtil;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -52,6 +53,7 @@ public final class RemoteStreamTransport<M> extends Actor {
       final ClusterCommunicationService transport,
       final RemoteStreamApiHandler<M> requestHandler,
       final LongUnaryOperator retryDelaySupplier) {
+    super(GlobalOpenTelemetry.get());
     this.transport = transport;
     this.requestHandler = requestHandler;
     this.retryDelaySupplier = retryDelaySupplier;

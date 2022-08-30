@@ -15,6 +15,7 @@ import io.camunda.zeebe.stream.api.EmptyProcessingResult;
 import io.camunda.zeebe.stream.util.RecordToWrite;
 import io.camunda.zeebe.stream.util.Records;
 import java.util.concurrent.atomic.AtomicBoolean;
+import io.opentelemetry.api.OpenTelemetry;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

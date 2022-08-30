@@ -16,6 +16,7 @@ import io.camunda.zeebe.scheduler.ActorScheduler;
 import io.camunda.zeebe.shared.MainSupport;
 import io.camunda.zeebe.shared.Profile;
 import io.camunda.zeebe.util.FileUtil;
+import io.opentelemetry.api.OpenTelemetry;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ public class StandaloneBroker
   private final ActorScheduler actorScheduler;
   private final AtomixCluster cluster;
   private final BrokerClient brokerClient;
+  private final OpenTelemetry openTelemetry;
 
   private Broker broker;
 
@@ -55,13 +57,14 @@ public class StandaloneBroker
       final SpringBrokerBridge springBrokerBridge,
       final ActorScheduler actorScheduler,
       final AtomixCluster cluster,
-      final BrokerClient brokerClient) {
+      final BrokerClient brokerClient, final OpenTelemetry openTelemetry) {
     this.configuration = configuration;
     this.identityConfiguration = identityConfiguration;
     this.springBrokerBridge = springBrokerBridge;
     this.actorScheduler = actorScheduler;
     this.cluster = cluster;
     this.brokerClient = brokerClient;
+    this.openTelemetry = openTelemetry;
   }
 
   public static void main(final String[] args) {
@@ -89,7 +92,7 @@ public class StandaloneBroker
             cluster,
             brokerClient);
 
-    broker = new Broker(systemContext, springBrokerBridge);
+    broker = new Broker(systemContext, springBrokerBridge, openTelemetry);
     broker.start();
   }
 

@@ -16,6 +16,7 @@ import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
 import io.camunda.zeebe.scheduler.testing.ControlledActorSchedulerRule;
 import java.time.Duration;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,7 +43,7 @@ public final class ActorFutureTest {
     final AtomicInteger callbackInvocations = new AtomicInteger(0);
 
     final Actor waitingActor =
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             actor.runOnCompletion(
@@ -54,7 +55,7 @@ public final class ActorFutureTest {
         };
 
     final Actor completingActor =
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             future.complete(null);
@@ -79,7 +80,7 @@ public final class ActorFutureTest {
     final AtomicInteger callbackInvocations = new AtomicInteger(0);
 
     final Actor waitingActor =
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             actor.runOnCompletionBlockingCurrentPhase(
@@ -88,7 +89,7 @@ public final class ActorFutureTest {
         };
 
     final Actor completingActor =
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             future.complete(null);
@@ -116,7 +117,7 @@ public final class ActorFutureTest {
     final List<String> results = new ArrayList<>();
 
     final Actor waitingActor =
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             actor.runOnCompletion(
@@ -131,7 +132,7 @@ public final class ActorFutureTest {
         };
 
     final Actor completingActor =
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             future1.complete("foo");
@@ -159,7 +160,7 @@ public final class ActorFutureTest {
     final List<Throwable> invocations = new ArrayList<>();
 
     final Actor waitingActor =
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             actor.runOnCompletion(
@@ -186,7 +187,7 @@ public final class ActorFutureTest {
     final List<Throwable> invocations = new ArrayList<>();
 
     final Actor waitingActor =
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             actor.runOnCompletion(Arrays.asList(future1, future2), t -> invocations.add(t));
@@ -194,7 +195,7 @@ public final class ActorFutureTest {
         };
 
     final Actor completingActor =
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             future1.completeExceptionally(new RuntimeException("foo"));
@@ -254,7 +255,7 @@ public final class ActorFutureTest {
     final AtomicReference<String> futureResult = new AtomicReference<>();
 
     schedulerRule.submitActor(
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             actor.runOnCompletion(
@@ -275,7 +276,7 @@ public final class ActorFutureTest {
     final AtomicReference<String> futureResult = new AtomicReference<>();
 
     schedulerRule.submitActor(
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             actor.runOnCompletionBlockingCurrentPhase(
@@ -322,7 +323,7 @@ public final class ActorFutureTest {
 
     // when
     final CompletableActorFuture<Object> completed =
-        CompletableActorFuture.completedExceptionally(result);
+        CompletableActorFuture.completedExceptionally(result, OpenTelemetry.noop());
 
     // then
     assertThat(completed).isDone();
@@ -395,7 +396,7 @@ public final class ActorFutureTest {
 
     // when
     schedulerRule.submitActor(
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             future.complete(0xFA);
@@ -422,7 +423,7 @@ public final class ActorFutureTest {
 
     // when
     schedulerRule.submitActor(
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             future.completeExceptionally(new IllegalArgumentException("moep"));
@@ -458,7 +459,8 @@ public final class ActorFutureTest {
   public void shouldThrowExceptionOnNonActorThread() {
     // given
     final CompletableActorFuture<String> future =
-        CompletableActorFuture.completedExceptionally(new IllegalArgumentException("moep"));
+        CompletableActorFuture.completedExceptionally(
+            new IllegalArgumentException("moep"), OpenTelemetry.noop());
 
     // expect
     assertThatThrownBy(() -> future.get(5, TimeUnit.MILLISECONDS))
@@ -483,7 +485,8 @@ public final class ActorFutureTest {
     final RuntimeException result = null;
 
     // then
-    assertThatThrownBy(() -> CompletableActorFuture.completedExceptionally(result))
+    assertThatThrownBy(
+            () -> CompletableActorFuture.completedExceptionally(result, OpenTelemetry.noop()))
         .isInstanceOf(NullPointerException.class)
         .hasMessageContaining("Throwable must not be null.");
   }
@@ -539,7 +542,7 @@ public final class ActorFutureTest {
     future.onComplete((r, t) -> callbackInvocations.incrementAndGet());
 
     final Actor completingActor =
-        new Actor() {
+        new TestActor() {
           @Override
           protected void onActorStarted() {
             future.complete(null);
@@ -570,7 +573,7 @@ public final class ActorFutureTest {
     future.onComplete((r, t) -> callbackInvocations.incrementAndGet(), decoratedExecutor);
 
     final Actor completingActor =
-        new Actor() {
+        new TestActor() {
           @Override
           protected void onActorStarted() {
             future.complete(null);
@@ -595,7 +598,7 @@ public final class ActorFutureTest {
     future.onComplete((r, t) -> callBackError.set(t));
 
     final Actor completingActor =
-        new Actor() {
+        new TestActor() {
           @Override
           protected void onActorStarted() {
             future.completeExceptionally(new RuntimeException("Expected"));
@@ -628,7 +631,7 @@ public final class ActorFutureTest {
     future.onComplete((r, t) -> callBackError.set(t), decoratedExecutor);
 
     final Actor completingActor =
-        new Actor() {
+        new TestActor() {
           @Override
           protected void onActorStarted() {
             future.completeExceptionally(new RuntimeException("Expected"));
@@ -653,7 +656,7 @@ public final class ActorFutureTest {
     final AtomicInteger futureResult = new AtomicInteger();
 
     final Actor completingActor =
-        new Actor() {
+        new TestActor() {
           @Override
           protected void onActorStarted() {
             future.complete(1);
@@ -685,7 +688,7 @@ public final class ActorFutureTest {
     final AtomicReference<Throwable> futureResult = new AtomicReference<>();
 
     final Actor completingActor =
-        new Actor() {
+        new TestActor() {
           @Override
           protected void onActorStarted() {
             future.completeExceptionally(new RuntimeException("Expected"));
@@ -778,6 +781,11 @@ public final class ActorFutureTest {
   }
 
   private static final class BlockedCallActor extends Actor {
+
+    BlockedCallActor() {
+      super(OpenTelemetry.noop());
+    }
+
     public void waitOnFuture() {
       actor.call(
           () -> {
@@ -795,6 +803,11 @@ public final class ActorFutureTest {
   }
 
   private static final class BlockedCallActorWithRunOnCompletion extends Actor {
+
+    BlockedCallActorWithRunOnCompletion() {
+      super(OpenTelemetry.noop());
+    }
+
     public void waitOnFuture() {
       actor.call(
           () -> {
@@ -811,7 +824,11 @@ public final class ActorFutureTest {
     }
   }
 
-  private static final class TestActor extends Actor {
+  private static class TestActor extends Actor {
+
+    TestActor() {
+      super(OpenTelemetry.noop());
+    }
 
     public <T> void awaitFuture(
         final ActorFuture<T> f, final BiConsumer<T, Throwable> onCompletion) {
@@ -829,6 +846,7 @@ public final class ActorFutureTest {
     private final ActorB actorB;
 
     ActorA(final ActorB actorB) {
+      super(OpenTelemetry.noop());
       this.actorB = actorB;
     }
 
@@ -854,7 +872,12 @@ public final class ActorFutureTest {
     }
   }
 
-  private static final class ActorB extends Actor {
+  private static class ActorB extends Actor {
+
+    private ActorB() {
+      super(OpenTelemetry.noop());
+    }
+
     public ActorFuture<Integer> getValue() {
       return actor.call(() -> 0xCAFE);
     }

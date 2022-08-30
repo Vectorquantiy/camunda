@@ -12,6 +12,7 @@ import io.camunda.zeebe.broker.system.configuration.BrokerCfg;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
 import io.camunda.zeebe.topology.changes.PartitionChangeExecutor;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 
 public class StaticClusterTopologyService implements ClusterTopologyService {
 
@@ -48,7 +49,7 @@ public class StaticClusterTopologyService implements ClusterTopologyService {
       partitionDistribution =
           new PartitionDistribution(staticConfiguration.generatePartitionDistribution());
     } catch (final Exception e) {
-      return CompletableActorFuture.completedExceptionally(e);
+      return CompletableActorFuture.completedExceptionally(e, GlobalOpenTelemetry.get());
     }
 
     return CompletableActorFuture.completed(null);

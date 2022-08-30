@@ -22,6 +22,7 @@ import io.camunda.zeebe.test.util.socket.SocketUtil;
 import io.camunda.zeebe.topology.serializer.ProtoBufSerializer;
 import io.camunda.zeebe.topology.state.ClusterTopology;
 import io.camunda.zeebe.topology.state.MemberState;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -99,7 +100,7 @@ final class ClusterTopologyGossiperTest {
   }
 
   private AtomixCluster createClusterNode(final Node localNode, final Collection<Node> nodes) {
-    return AtomixCluster.builder()
+    return AtomixCluster.builder(OpenTelemetry.noop())
         .withAddress(localNode.address())
         .withMemberId(localNode.id().id())
         .withMembershipProvider(new BootstrapDiscoveryProvider(nodes))
@@ -114,6 +115,7 @@ final class ClusterTopologyGossiperTest {
 
     private TestGossiper(
         final AtomixCluster atomixCluster, final ClusterTopologyGossiperConfig config) {
+      super(OpenTelemetry.noop());
 
       gossiper =
           new ClusterTopologyGossiper(

@@ -16,8 +16,16 @@ import io.camunda.zeebe.broker.system.partitions.PartitionTransitionContext;
 import io.camunda.zeebe.broker.system.partitions.PartitionTransitionStep;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.OpenTelemetry;
 
 public final class BackupServiceTransitionStep implements PartitionTransitionStep {
+
+  private final OpenTelemetry openTelemetry;
+
+  public BackupServiceTransitionStep(final OpenTelemetry openTelemetry) {
+    this.openTelemetry = openTelemetry;
+  }
 
   @Override
   public ActorFuture<Void> prepareTransition(
@@ -84,7 +92,7 @@ public final class BackupServiceTransitionStep implements PartitionTransitionSte
   private static ActorFuture<Void> installNoopBackupManager(
       final PartitionTransitionContext context, final String reasonForNoop) {
     final ActorFuture<Void> backupManagerInstalled;
-    final var backupManager = new NoopBackupManager(reasonForNoop);
+    final var backupManager = new NoopBackupManager(reasonForNoop, GlobalOpenTelemetry.get());
     context.setBackupManager(backupManager);
     backupManagerInstalled = context.getConcurrencyControl().createCompletedFuture();
     return backupManagerInstalled;
@@ -107,7 +115,8 @@ public final class BackupServiceTransitionStep implements PartitionTransitionSte
             context.getBackupStore(),
             context.getPersistedSnapshotStore(),
             context.getRaftPartition().dataDirectory().toPath(),
-            index -> context.getRaftPartition().getServer().getTailSegments(index));
+            index -> context.getRaftPartition().getServer().getTailSegments(index),
+            openTelemetry);
 
     final ActorFuture<Void> installed = context.getConcurrencyControl().createFuture();
     context

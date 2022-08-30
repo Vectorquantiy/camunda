@@ -15,6 +15,7 @@ import io.camunda.zeebe.scheduler.Actor;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
 import io.camunda.zeebe.transport.stream.api.RemoteStreamErrorHandler;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.util.Objects;
 
 /**
@@ -28,6 +29,7 @@ public final class RemoteJobStreamErrorHandlerService extends Actor
   private final String name;
 
   public RemoteJobStreamErrorHandlerService(final JobStreamErrorHandler errorHandler) {
+    super(GlobalOpenTelemetry.get());
     delegate = new RemoteJobStreamErrorHandler(errorHandler);
     name = "RemoteJobStreamErrorHandler";
   }

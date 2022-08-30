@@ -23,6 +23,7 @@ import io.camunda.zeebe.stream.impl.StreamProcessorMode;
 import io.camunda.zeebe.util.health.FailureListener;
 import io.camunda.zeebe.util.health.HealthMonitorable;
 import io.camunda.zeebe.util.health.HealthReport;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Map;
@@ -73,6 +74,7 @@ public final class AsyncSnapshotDirector extends Actor
       final Duration snapshotRate,
       final StreamProcessorMode streamProcessorMode,
       final Callable<CompletableFuture<Void>> flushLog) {
+    super(GlobalOpenTelemetry.get());
     this.streamProcessor = streamProcessor;
     this.stateController = stateController;
     processorName = streamProcessor.getName();

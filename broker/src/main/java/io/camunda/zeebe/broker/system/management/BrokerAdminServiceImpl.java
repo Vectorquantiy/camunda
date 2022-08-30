@@ -19,6 +19,7 @@ import io.camunda.zeebe.scheduler.future.ActorFutureCollector;
 import io.camunda.zeebe.snapshots.PersistedSnapshot;
 import io.camunda.zeebe.snapshots.impl.FileBasedSnapshotId;
 import io.camunda.zeebe.stream.impl.StreamProcessor;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,6 +42,7 @@ public final class BrokerAdminServiceImpl extends Actor implements BrokerAdminSe
   private final PartitionManagerImpl partitionManager;
 
   public BrokerAdminServiceImpl(final PartitionManagerImpl partitionManager) {
+    super(GlobalOpenTelemetry.get());
     this.partitionManager = partitionManager;
   }
 

@@ -18,6 +18,7 @@ import io.camunda.zeebe.transport.stream.api.NoSuchStreamException;
 import io.camunda.zeebe.transport.stream.api.StreamExhaustedException;
 import io.camunda.zeebe.transport.stream.impl.messages.ErrorCode;
 import io.camunda.zeebe.util.buffer.BufferUtil;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ final class ClientStreamPusherTest {
   private final AggregatedClientStream<TestSerializableData> stream =
       new AggregatedClientStream<>(
           UUID.randomUUID(), new LogicalId<>(streamType, metadata), metrics);
-  private final ClientStreamPusher streamPusher = new ClientStreamPusher(metrics);
+  private final ClientStreamPusher streamPusher = new ClientStreamPusher(metrics, OpenTelemetry.noop());
 
   @Test
   void shouldRetryWithAllAvailableClientsIfPushFailed() {

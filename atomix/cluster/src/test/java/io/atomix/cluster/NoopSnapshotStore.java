@@ -21,6 +21,7 @@ import io.camunda.zeebe.snapshots.PersistedSnapshot;
 import io.camunda.zeebe.snapshots.PersistedSnapshotListener;
 import io.camunda.zeebe.snapshots.ReceivableSnapshotStore;
 import io.camunda.zeebe.snapshots.ReceivedSnapshot;
+import io.opentelemetry.api.OpenTelemetry;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;

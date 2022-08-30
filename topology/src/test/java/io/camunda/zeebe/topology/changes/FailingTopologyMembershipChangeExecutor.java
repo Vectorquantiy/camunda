@@ -10,16 +10,17 @@ package io.camunda.zeebe.topology.changes;
 import io.atomix.cluster.MemberId;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
+import io.opentelemetry.api.OpenTelemetry;
 
 final class FailingTopologyMembershipChangeExecutor implements TopologyMembershipChangeExecutor {
 
   @Override
   public ActorFuture<Void> addBroker(final MemberId memberId) {
-    return CompletableActorFuture.completedExceptionally(new RuntimeException("Force failure"));
+    return CompletableActorFuture.completedExceptionally(new RuntimeException("Force failure"), OpenTelemetry.noop());
   }
 
   @Override
   public ActorFuture<Void> removeBroker(final MemberId memberId) {
-    return CompletableActorFuture.completedExceptionally(new RuntimeException("Force failure"));
+    return CompletableActorFuture.completedExceptionally(new RuntimeException("Force failure"), OpenTelemetry.noop());
   }
 }

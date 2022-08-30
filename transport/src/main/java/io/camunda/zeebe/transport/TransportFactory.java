@@ -26,18 +26,22 @@ import io.camunda.zeebe.transport.stream.impl.RemoteStreamerImpl;
 import io.camunda.zeebe.util.buffer.BufferWriter;
 import java.util.function.Function;
 import org.agrona.DirectBuffer;
+import io.opentelemetry.api.OpenTelemetry;
 
 public final class TransportFactory {
 
   private final ActorSchedulingService actorSchedulingService;
+  private final OpenTelemetry openTelemetry;
 
-  public TransportFactory(final ActorSchedulingService actorSchedulingService) {
+  public TransportFactory(
+      final ActorSchedulingService actorSchedulingService, final OpenTelemetry openTelemetry) {
     this.actorSchedulingService = actorSchedulingService;
+    this.openTelemetry = openTelemetry;
   }
 
   public ServerTransport createServerTransport(
       final int nodeId, final MessagingService messagingService) {
-    final var atomixServerTransport = new AtomixServerTransport(messagingService, nodeId);
+    final var atomixServerTransport = new AtomixServerTransport(messagingService, nodeId, openTelemetry);
     actorSchedulingService.submitActor(atomixServerTransport);
     return atomixServerTransport;
   }
@@ -64,6 +68,6 @@ public final class TransportFactory {
   public <M extends BufferWriter> ClientStreamService<M> createRemoteStreamClient(
       final ClusterCommunicationService clusterCommunicationService,
       final ClientStreamMetrics metrics) {
-    return new ClientStreamServiceImpl<>(clusterCommunicationService, metrics);
+    return new ClientStreamServiceImpl<>(clusterCommunicationService, metrics, openTelemetry);
   }
 }

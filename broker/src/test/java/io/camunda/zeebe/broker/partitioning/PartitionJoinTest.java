@@ -17,6 +17,7 @@ import io.camunda.zeebe.broker.system.configuration.BrokerCfg;
 import io.camunda.zeebe.broker.test.TestActorSchedulerFactory;
 import io.camunda.zeebe.broker.test.TestBrokerClientFactory;
 import io.camunda.zeebe.broker.test.TestClusterFactory;
+import io.opentelemetry.api.OpenTelemetry;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
@@ -102,6 +103,6 @@ final class PartitionJoinTest {
     final var systemContext =
         new SystemContext(brokerCfg, actorScheduler, atomixCluster, brokerClient);
 
-    return new Broker(systemContext, new SpringBrokerBridge(), List.of());
+    return new Broker(systemContext, new SpringBrokerBridge(), List.of(), OpenTelemetry.noop());
   }
 }

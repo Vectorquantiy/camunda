@@ -37,6 +37,7 @@ import io.camunda.zeebe.util.health.FailureListener;
 import io.camunda.zeebe.util.health.HealthIssue;
 import io.camunda.zeebe.util.health.HealthReport;
 import io.camunda.zeebe.util.health.HealthStatus;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -209,7 +210,7 @@ public class ZeebePartitionTest {
     final CountDownLatch latch = new CountDownLatch(1);
 
     when(transition.toLeader(anyLong()))
-        .thenReturn(CompletableActorFuture.completedExceptionally(new Exception("expected")));
+        .thenReturn(CompletableActorFuture.completedExceptionally(new Exception("expected"), OpenTelemetry.noop()));
     when(transition.toFollower(anyLong()))
         .then(
             invocation -> {
@@ -247,7 +248,7 @@ public class ZeebePartitionTest {
     when(transition.toLeader(anyLong()))
         .thenReturn(
             CompletableActorFuture.completedExceptionally(
-                new RecoverablePartitionTransitionException("something went wrong")));
+                new RecoverablePartitionTransitionException("something went wrong"), OpenTelemetry.noop()));
 
     when(raft.getRole()).thenReturn(Role.LEADER);
     when(raft.term()).thenReturn(2L);
@@ -275,7 +276,7 @@ public class ZeebePartitionTest {
     final CountDownLatch latch = new CountDownLatch(1);
 
     when(transition.toFollower(anyLong()))
-        .thenReturn(CompletableActorFuture.completedExceptionally(new Exception("expected")));
+        .thenReturn(CompletableActorFuture.completedExceptionally(new Exception("expected"), OpenTelemetry.noop()));
     when(transition.toInactive(anyLong()))
         .then(
             invocation -> {
@@ -305,7 +306,7 @@ public class ZeebePartitionTest {
     final CompletableActorFuture<Void> inactiveTransitionCompleted = new CompletableActorFuture<>();
 
     when(transition.toFollower(anyLong()))
-        .thenReturn(CompletableActorFuture.completedExceptionally(new Exception("expected")));
+        .thenReturn(CompletableActorFuture.completedExceptionally(new Exception("expected"), OpenTelemetry.noop()));
     when(transition.toInactive(anyLong())).then(invocation -> inactiveTransitionCompleted);
     when(raft.getRole()).thenReturn(Role.FOLLOWER);
     when(ctx.getCurrentRole()).thenReturn(Role.FOLLOWER);
@@ -333,7 +334,7 @@ public class ZeebePartitionTest {
     // given
     when(transition.toLeader(anyLong()))
         .thenReturn(
-            CompletableActorFuture.completedExceptionally(new UnrecoverableException("expected")));
+            CompletableActorFuture.completedExceptionally(new UnrecoverableException("expected"), OpenTelemetry.noop()));
     when(raft.getRole()).thenReturn(Role.LEADER);
     when(raft.term()).thenReturn(1L);
 

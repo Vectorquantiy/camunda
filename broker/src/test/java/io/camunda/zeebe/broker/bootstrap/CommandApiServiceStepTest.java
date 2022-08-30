@@ -29,6 +29,7 @@ import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.testing.TestConcurrencyControl;
 import io.camunda.zeebe.test.util.socket.SocketUtil;
 import io.camunda.zeebe.transport.impl.AtomixServerTransport;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,7 +71,8 @@ class CommandApiServiceStepTest {
             mock(ClusterServicesImpl.class, RETURNS_DEEP_STUBS),
             mock(BrokerClient.class),
             Collections.emptyList(),
-            TEST_SHUTDOWN_TIMEOUT);
+            TEST_SHUTDOWN_TIMEOUT,
+            OpenTelemetry.noop());
     testBrokerStartupContext.setConcurrencyControl(CONCURRENCY_CONTROL);
     testBrokerStartupContext.setDiskSpaceUsageMonitor(mock(DiskSpaceUsageMonitorActor.class));
     testBrokerStartupContext.setGatewayBrokerTransport(mock(AtomixServerTransport.class));

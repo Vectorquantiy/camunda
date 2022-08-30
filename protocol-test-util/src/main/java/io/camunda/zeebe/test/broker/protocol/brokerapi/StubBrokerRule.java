@@ -20,6 +20,7 @@ import io.camunda.zeebe.test.util.socket.SocketUtil;
 import io.camunda.zeebe.transport.RequestType;
 import io.camunda.zeebe.transport.ServerTransport;
 import io.camunda.zeebe.transport.TransportFactory;
+import io.opentelemetry.api.OpenTelemetry;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.function.Predicate;
@@ -61,14 +62,15 @@ public final class StubBrokerRule extends ExternalResource {
     final InetSocketAddress nextAddress = SocketUtil.getNextAddress();
     currentStubHost = nextAddress.getHostName();
     currentStubPort = nextAddress.getPort();
+    final OpenTelemetry openTelemetry = OpenTelemetry.noop();
     cluster =
-        AtomixCluster.builder()
+        AtomixCluster.builder(openTelemetry)
             .withPort(currentStubPort)
             .withMemberId("0")
             .withClusterId("cluster")
             .build();
     cluster.start().join();
-    final var transportFactory = new TransportFactory(scheduler);
+    final var transportFactory = new TransportFactory(scheduler, openTelemetry);
     serverTransport = transportFactory.createServerTransport(nodeId, cluster.getMessagingService());
 
     channelHandler = new StubRequestHandler(msgPackHelper);

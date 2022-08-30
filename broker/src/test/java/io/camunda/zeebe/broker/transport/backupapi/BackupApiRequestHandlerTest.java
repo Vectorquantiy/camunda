@@ -39,6 +39,7 @@ import io.camunda.zeebe.transport.impl.AtomixServerTransport;
 import io.camunda.zeebe.util.Either;
 import io.camunda.zeebe.util.buffer.BufferReader;
 import io.camunda.zeebe.util.buffer.BufferUtil;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -264,7 +265,7 @@ final class BackupApiRequestHandlerTest {
 
     when(backupManager.getBackupStatus(checkpointId))
         .thenReturn(
-            CompletableActorFuture.completedExceptionally(new RuntimeException("Expected")));
+            CompletableActorFuture.completedExceptionally(new RuntimeException("Expected"), OpenTelemetry.noop()));
 
     // when
     handleRequest(request);
@@ -347,7 +348,7 @@ final class BackupApiRequestHandlerTest {
 
     when(backupManager.listBackups())
         .thenReturn(
-            CompletableActorFuture.completedExceptionally(new RuntimeException("list failed")));
+            CompletableActorFuture.completedExceptionally(new RuntimeException("list failed"), OpenTelemetry.noop()));
 
     // when
     handleRequest(request);
@@ -386,7 +387,7 @@ final class BackupApiRequestHandlerTest {
     when(backupManager.deleteBackup(anyLong()))
         .thenReturn(
             CompletableActorFuture.completedExceptionally(
-                new RuntimeException("Expected failure")));
+                new RuntimeException("Expected failure"), OpenTelemetry.noop()));
 
     // when
     handleRequest(request);

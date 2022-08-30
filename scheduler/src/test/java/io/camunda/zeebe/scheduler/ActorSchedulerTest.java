@@ -13,6 +13,7 @@ import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
+import io.opentelemetry.api.OpenTelemetry;
 import org.junit.jupiter.api.Test;
 
 final class ActorSchedulerTest {
@@ -31,7 +32,7 @@ final class ActorSchedulerTest {
     // given
     final var latch = new CountDownLatch(1);
     final var testActor =
-        new Actor() {
+        new TestActor() {
           @Override
           protected void onActorClosing() {
             try {
@@ -83,5 +84,9 @@ final class ActorSchedulerTest {
         .isInstanceOf(IllegalStateException.class);
   }
 
-  private static final class TestActor extends Actor {}
+  private static class TestActor extends Actor {
+    private TestActor() {
+      super(OpenTelemetry.noop());
+    }
+  }
 }

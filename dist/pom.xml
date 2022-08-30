@@ -170,6 +170,15 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>io.opentelemetry.javaagent</groupId>
+      <artifactId>opentelemetry-javaagent</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-exporter-otlp</artifactId>
+    </dependency>
+
     <!-- needed for the Spring actuators which enable health checks and liveness probes-->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -324,9 +333,12 @@
         <configuration>
           <assembleDirectory>${project.build.directory}/camunda-zeebe</assembleDirectory>
           <configurationDirectory>config</configurationDirectory>
-          <copyConfigurationDirectory>true</copyConfigurationDirectory>
-          <extraJvmArguments>-XX:+ExitOnOutOfMemoryError
-            -Dfile.encoding=UTF-8 -Xshare:auto</extraJvmArguments>
+          <extraJvmArguments>-Xms128m
+            -XX:+ExitOnOutOfMemoryError
+            -Dfile.encoding=UTF-8
+            -Xshare:auto
+            -javaagent:$ZB_HOME/lib/opentelemetry-javaagent-${version.opentelemetry}.jar
+          </extraJvmArguments>
           <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
           <platforms>
             <platform>windows</platform>
@@ -431,6 +443,8 @@
             <!-- Used to parse PKCS1 certificates -->
             <dependency>org.bouncycastle:bcprov-jdk18on</dependency>
             <dependency>org.bouncycastle:bcpkix-jdk18on</dependency>
+            <!-- Needed for Opentelemetry Support !-->
+            <dependency>io.opentelemetry.javaagent:opentelemetry-javaagent</dependency>
           </usedDependencies>
         </configuration>
       </plugin>

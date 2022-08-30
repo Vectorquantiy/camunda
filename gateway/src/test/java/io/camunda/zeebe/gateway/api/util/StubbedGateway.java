@@ -44,6 +44,7 @@ import io.grpc.Server;
 import io.grpc.ServerInterceptors;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -177,7 +178,7 @@ public final class StubbedGateway {
         final ClientStreamConsumer clientStreamConsumer) {
       final var failure = failOnAdd.get();
       if (failure != null) {
-        return CompletableActorFuture.completedExceptionally(failure);
+        return CompletableActorFuture.completedExceptionally(failure, GlobalOpenTelemetry.get());
       }
 
       final StubbedClientStreamId streamId = new StubbedClientStreamId(UUID.randomUUID());
@@ -211,7 +212,7 @@ public final class StubbedGateway {
       }
 
       return CompletableActorFuture.completedExceptionally(
-          new RuntimeException("No stream exists with given id"));
+          new RuntimeException("No stream exists with given id"), GlobalOpenTelemetry.get());
     }
 
     public boolean containsStreamFor(final String streamType) {

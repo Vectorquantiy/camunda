@@ -27,6 +27,7 @@ import io.camunda.zeebe.transport.stream.impl.messages.RemoveStreamResponse;
 import io.camunda.zeebe.transport.stream.impl.messages.StreamTopics;
 import io.camunda.zeebe.util.buffer.BufferUtil;
 import io.camunda.zeebe.util.buffer.BufferWriter;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.Set;
 import java.util.UUID;
@@ -52,7 +53,8 @@ class ClientStreamManagerTest {
       new ClientStreamManager<>(
           registry,
           new ClientStreamRequestManager<>(mockTransport, new TestConcurrencyControl()),
-          metrics);
+          metrics,
+          OpenTelemetry.noop());
 
   @BeforeEach
   void setup() {
