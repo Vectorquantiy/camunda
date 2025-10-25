@@ -4,6 +4,7 @@ volumes:
   broker_1: {}
   broker_2: {}
   broker_3: {}
+  elastic_data: {}
 
 services:
   zeebe-gateway:
@@ -18,6 +19,10 @@ services:
       - ATOMIX_LOG_LEVEL=${ATOMIX_LOG_LEVEL:-info}
       - ZEEBE_BROKER_CLUSTER_NODEID=zeebe-gateway
       - ZEEBE_GATEWAY_CLUSTER_INITIALCONTACTPOINTS=broker-1:26502
+      - ZEEBE_GATEWAY_CLUSTER_MEMBERID=zeebe-gateway
+      - ZEEBE_GATEWAY_NETWORK_HOST=0.0.0.0
+      - ZEEBE_GATEWAY_MONITORING_ENABLED=true
+      - ZEEBE_GATEWAY_MONITORING_PORT=9600
       - ZEEBE_GATEWAY_LONGPOLLING_ENABLED=false
       - "JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Xmx512m"
       # Opentelemetry settings
@@ -34,11 +39,22 @@ services:
       - ZEEBE_LOG_LEVEL=${ZEEBE_LOG_LEVEL:-debug}
       - ATOMIX_LOG_LEVEL=${ATOMIX_LOG_LEVEL:-info}
       - ZEEBE_BROKER_CLUSTER_NODEID=0
-      - ZEEBE_BROKER_CLUSTER_PARTITIONSCOUNT=3
+      - ZEEBE_BROKER_CLUSTER_PARTITIONSCOUNT=1
       - ZEEBE_BROKER_CLUSTER_CLUSTERSIZE=1
       - ZEEBE_BROKER_CLUSTER_REPLICATIONFACTOR=1
       - ZEEBE_BROKER_CLUSTER_INITIALCONTACTPOINTS=broker-1:26502
       - ZEEBE_BROKER_GATEWAY_ENABLE=false
+      # Enable the Elasticsearch exporter for Operate
+      - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_CLASSNAME=io.camunda.zeebe.exporter.ElasticsearchExporter
+      - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_INDEX_PREFIX=zeebe-record
+      - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_BULK_SIZE=1
+      - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_URL=http://elasticsearch:9200
+      # Optional fine-tuning (recommended)
+      - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_INDEX_TEMPLATE_VERSION=2
+      - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_DEPLOYMENT_INDEXING=true
+      - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_PROCESS_INDEXING=true
+      - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_INCIDENT_INDEXING=true
+      - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_PROCESS_INSTANCE_INDEXING=true
       - "JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 -Xmx2g"
       # Opentelemetry settings
       - OTEL_JAVAAGENT_ENABLED=true
@@ -116,3 +132,36 @@ services:
       - "16686:16686"
       - "16685:16685"
       - "14250"
+
+  elasticsearch:
+    image: elasticsearch:7.17.26
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+      - ES_USE_CONTAINERIZED_JAVA=true
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9200" ]
+      interval: 5s
+      retries: 12
+
+  operate:
+    image: camunda/operate:8.4.18
+    container_name: operate
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      zeebe-gateway:
+        condition: service_started
+    environment:
+      - CAMUNDA_OPERATE_ELASTICSEARCH_URL=http://elasticsearch:9200
+      - CAMUNDA_OPERATE_ZEEBEELASTICSEARCH_URL=http://elasticsearch:9200
+      - CAMUNDA_OPERATE_ZEEBE_GATEWAYADDRESS=zeebe-gateway:26500
+      - SPRING_PROFILES_ACTIVE=dev
+    ports:
+      - 8081:8080

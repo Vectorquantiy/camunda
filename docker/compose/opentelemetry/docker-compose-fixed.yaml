@@ -7,7 +7,7 @@ volumes:
 
 services:
   zeebe-gateway:
-    image: camunda/zeebe:${ZEEBE_VERSION:-opentelemetry-test}
+    image: camunda/zeebe:8.4.18
     ports:
       - 26500:26500
       - 5005:5005
@@ -29,7 +29,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://opentelemetry-collector:4317
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
   broker-1:
-    image: camunda/zeebe:${ZEEBE_VERSION:-opentelemetry-test}
+    image: camunda/zeebe:8.4.18
     environment:
       - ZEEBE_LOG_LEVEL=${ZEEBE_LOG_LEVEL:-debug}
       - ATOMIX_LOG_LEVEL=${ATOMIX_LOG_LEVEL:-info}
