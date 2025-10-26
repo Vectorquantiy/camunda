@@ -18,14 +18,16 @@ package io.atomix.cluster.messaging.impl;
 
 import com.google.common.base.MoreObjects;
 import io.atomix.utils.misc.ArraySizeHashPrinter;
+import java.util.Map;
+import java.util.Objects;
 
 /** Internal reply message. */
 public final class ProtocolReply extends ProtocolMessage {
 
   private final Status status;
 
-  public ProtocolReply(final long id, final byte[] payload, final Status status) {
-    super(id, payload);
+  public ProtocolReply(final long id, final byte[] payload, final Status status, final Map<String, String> metadata) {
+    super(id, payload, metadata);
     this.status = status;
   }
 
@@ -45,6 +47,26 @@ public final class ProtocolReply extends ProtocolMessage {
         .add("status", status())
         .add("payload", ArraySizeHashPrinter.of(payload()))
         .toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), status);
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    final ProtocolReply that = (ProtocolReply) o;
+    return status == that.status;
   }
 
   /** Message status. */

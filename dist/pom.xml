@@ -170,6 +170,15 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>io.opentelemetry.javaagent</groupId>
+      <artifactId>opentelemetry-javaagent</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-exporter-otlp</artifactId>
+    </dependency>
+
     <!-- needed for the Spring actuators which enable health checks and liveness probes-->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -326,7 +335,10 @@
           <configurationDirectory>config</configurationDirectory>
           <copyConfigurationDirectory>true</copyConfigurationDirectory>
           <extraJvmArguments>-XX:+ExitOnOutOfMemoryError
-            -Dfile.encoding=UTF-8 -Xshare:auto</extraJvmArguments>
+            -Dfile.encoding=UTF-8 -Xshare:auto
+            -Dfile.encoding=UTF-8
+            -javaagent:$ZB_HOME/lib/opentelemetry-javaagent-${version.opentelemetry}.jar
+          </extraJvmArguments>
           <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
           <platforms>
             <platform>windows</platform>

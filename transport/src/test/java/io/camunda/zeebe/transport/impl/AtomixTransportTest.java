@@ -25,6 +25,7 @@ import io.camunda.zeebe.transport.RequestType;
 import io.camunda.zeebe.transport.ServerOutput;
 import io.camunda.zeebe.transport.ServerTransport;
 import io.camunda.zeebe.transport.TransportFactory;
+import io.opentelemetry.api.OpenTelemetry;
 import java.net.ConnectException;
 import java.time.Duration;
 import java.util.Arrays;
@@ -111,7 +112,7 @@ public class AtomixTransportTest {
                     nodeAddressSupplier = () -> serverAddress;
                     nettyMessagingService =
                         new NettyMessagingService(
-                            "cluster", Address.from(serverAddress), new MessagingConfig());
+                            "cluster", Address.from(serverAddress), new MessagingConfig(), OpenTelemetry.noop());
                     nettyMessagingService.start().join();
                   }
 

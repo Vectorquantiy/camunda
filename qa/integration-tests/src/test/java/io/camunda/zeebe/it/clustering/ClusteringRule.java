@@ -72,6 +72,7 @@ import io.camunda.zeebe.test.util.socket.SocketUtil;
 import io.camunda.zeebe.util.VersionUtil;
 import io.camunda.zeebe.util.exception.UncheckedExecutionException;
 import io.netty.util.NetUtil;
+import io.opentelemetry.api.OpenTelemetry;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -340,7 +341,7 @@ public class ClusteringRule extends ExternalResource {
     final var atomixCluster =
         new AtomixCluster(
             new BrokerClusterConfiguration().clusterConfig(brokerSpringConfig),
-            Version.from(VersionUtil.getVersion()));
+            Version.from(VersionUtil.getVersion()), OpenTelemetry.noop());
     final var scheduler =
         new io.camunda.zeebe.broker.ActorSchedulerConfiguration(
                 brokerSpringConfig, actorClockConfiguration)
@@ -372,7 +373,7 @@ public class ClusteringRule extends ExternalResource {
         new Broker(
             systemContext,
             getSpringBrokerBridge(nodeId),
-            Collections.singletonList(new LeaderListener(partitionLatch, nodeId)));
+            Collections.singletonList(new LeaderListener(partitionLatch, nodeId)), OpenTelemetry.noop());
 
     CompletableFuture.runAsync(broker::start);
     return broker;
@@ -464,7 +465,7 @@ public class ClusteringRule extends ExternalResource {
   private GatewayResource createGateway(final GatewayProperties gatewayCfg) {
     final var config = new GatewayConfiguration(gatewayCfg, new LifecycleProperties());
     final var clusterFactory = new GatewayClusterConfiguration();
-    final var atomixCluster = clusterFactory.atomixCluster(clusterFactory.clusterConfig(config));
+    final var atomixCluster = clusterFactory.atomixCluster(clusterFactory.clusterConfig(config), OpenTelemetry.noop());
     atomixCluster.start().join();
 
     final ActorScheduler actorScheduler =

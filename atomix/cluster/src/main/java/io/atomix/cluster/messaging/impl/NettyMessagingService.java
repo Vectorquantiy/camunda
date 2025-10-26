@@ -72,12 +72,14 @@ import io.netty.resolver.dns.LoggingDnsQueryLifeCycleObserverFactory;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.concurrent.Future;
+import io.opentelemetry.api.OpenTelemetry;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +108,7 @@ public final class NettyMessagingService implements ManagedMessagingService {
   private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
   private static final String TLS_PROTOCOL = "TLSv1.3";
 
+  private final OpenTelemetry openTelemetry;
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final Address advertisedAddress;
   private final Collection<Address> bindingAddresses = new ArrayList<>();
@@ -133,15 +136,18 @@ public final class NettyMessagingService implements ManagedMessagingService {
   private final MessagingMetrics messagingMetrics = new MessagingMetricsImpl();
 
   public NettyMessagingService(
-      final String cluster, final Address advertisedAddress, final MessagingConfig config) {
-    this(cluster, advertisedAddress, config, ProtocolVersion.latest());
+      final String cluster, final Address advertisedAddress, final MessagingConfig config,
+      final OpenTelemetry openTelemetry) {
+    this(cluster, advertisedAddress, config, ProtocolVersion.latest(), openTelemetry);
   }
 
   NettyMessagingService(
       final String cluster,
       final Address advertisedAddress,
       final MessagingConfig config,
-      final ProtocolVersion protocolVersion) {
+      final ProtocolVersion protocolVersion,
+      final OpenTelemetry openTelemetry) {
+    this.openTelemetry = openTelemetry;
     preamble = cluster.hashCode();
     this.advertisedAddress = advertisedAddress;
     this.protocolVersion = protocolVersion;
@@ -203,7 +209,7 @@ public final class NettyMessagingService implements ManagedMessagingService {
       final Address address, final String type, final byte[] payload, final boolean keepAlive) {
     final long messageId = messageIdGenerator.incrementAndGet();
     final ProtocolRequest message =
-        new ProtocolRequest(messageId, advertisedAddress, type, payload);
+        new ProtocolRequest(messageId, advertisedAddress, type, payload, new HashMap<>());
     return executeOnPooledConnection(
         address, type, c -> c.sendAsync(message), MoreExecutors.directExecutor());
   }
@@ -251,7 +257,7 @@ public final class NettyMessagingService implements ManagedMessagingService {
 
     final long messageId = messageIdGenerator.incrementAndGet();
     final ProtocolRequest message =
-        new ProtocolRequest(messageId, advertisedAddress, type, payload);
+        new ProtocolRequest(messageId, advertisedAddress, type, payload, new HashMap<>());
     final CompletableFuture<byte[]> responseFuture;
     if (keepAlive) {
       responseFuture =
@@ -312,7 +318,7 @@ public final class NettyMessagingService implements ManagedMessagingService {
                       responsePayload = StringUtil.getBytes(exceptionMessage);
                     }
                   }
-                  connection.reply(message.id(), status, Optional.ofNullable(responsePayload));
+                  connection.reply(message, status, Optional.ofNullable(responsePayload));
                 }));
   }
 
@@ -325,7 +331,7 @@ public final class NettyMessagingService implements ManagedMessagingService {
           // Extract message components here to avoid retaining a reference to the entire message.
           // This means we don't need to retain the message payload until the response callback is
           // completed.
-          final var id = message.id();
+          // final var id = message.id();
           final var subject = message.subject();
           final var sender = message.sender();
           final var payload = message.payload();
@@ -352,7 +358,7 @@ public final class NettyMessagingService implements ManagedMessagingService {
                         responsePayload = StringUtil.getBytes(error.getMessage());
                       }
                     }
-                    connection.reply(id, status, Optional.ofNullable(responsePayload));
+                    connection.reply(message, status, Optional.ofNullable(responsePayload));
                   });
         });
   }
@@ -891,7 +897,8 @@ public final class NettyMessagingService implements ManagedMessagingService {
           messageIdGenerator.incrementAndGet(),
           advertisedAddress,
           HEARTBEAT_SUBJECT,
-          HEARTBEAT_PAYLOAD);
+          HEARTBEAT_PAYLOAD,
+          new HashMap<>());
     }
   }
 
@@ -1121,7 +1128,7 @@ public final class NettyMessagingService implements ManagedMessagingService {
                 writeProtocolVersion(context, protocolVersion);
                 activateProtocolVersion(
                     context,
-                    new RemoteServerConnection(handlers, context.channel()),
+                    new RemoteServerConnection(handlers, context.channel(), openTelemetry),
                     protocolVersion);
               });
     }

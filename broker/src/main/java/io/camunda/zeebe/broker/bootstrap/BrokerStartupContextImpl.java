@@ -32,6 +32,7 @@ import io.camunda.zeebe.protocol.impl.encoding.BrokerInfo;
 import io.camunda.zeebe.scheduler.ActorSchedulingService;
 import io.camunda.zeebe.scheduler.ConcurrencyControl;
 import io.camunda.zeebe.transport.impl.AtomixServerTransport;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,7 @@ public final class BrokerStartupContextImpl implements BrokerStartupContext {
   private final List<PartitionListener> partitionListeners = new ArrayList<>();
   private final List<PartitionRaftListener> partitionRaftListeners = new ArrayList<>();
   private final Duration shutdownTimeout;
+  private final OpenTelemetry openTelemetry;
 
   private ConcurrencyControl concurrencyControl;
   private DiskSpaceUsageMonitor diskSpaceUsageMonitor;
@@ -75,7 +77,8 @@ public final class BrokerStartupContextImpl implements BrokerStartupContext {
       final ClusterServicesImpl clusterServices,
       final BrokerClient brokerClient,
       final List<PartitionListener> additionalPartitionListeners,
-      final Duration shutdownTimeout) {
+      final Duration shutdownTimeout,
+      final OpenTelemetry openTelemetry) {
 
     this.brokerInfo = requireNonNull(brokerInfo);
     this.configuration = requireNonNull(configuration);
@@ -87,6 +90,7 @@ public final class BrokerStartupContextImpl implements BrokerStartupContext {
     this.identityConfiguration = identityConfiguration;
     this.brokerClient = brokerClient;
     this.shutdownTimeout = shutdownTimeout;
+    this.openTelemetry = openTelemetry;
     partitionListeners.addAll(additionalPartitionListeners);
   }
 
@@ -100,7 +104,8 @@ public final class BrokerStartupContextImpl implements BrokerStartupContext {
       final ClusterServicesImpl clusterServices,
       final BrokerClient brokerClient,
       final List<PartitionListener> additionalPartitionListeners,
-      final Duration shutdownTimeout) {
+      final Duration shutdownTimeout,
+      final OpenTelemetry openTelemetry) {
 
     this(
         brokerInfo,
@@ -113,7 +118,7 @@ public final class BrokerStartupContextImpl implements BrokerStartupContext {
         clusterServices,
         brokerClient,
         additionalPartitionListeners,
-        shutdownTimeout);
+        shutdownTimeout, openTelemetry);
   }
 
   @Override
@@ -308,5 +313,10 @@ public final class BrokerStartupContextImpl implements BrokerStartupContext {
   @Override
   public Duration getShutdownTimeout() {
     return shutdownTimeout;
+  }
+
+  @Override
+  public OpenTelemetry getOpenTelemetryApi() {
+    return openTelemetry;
   }
 }

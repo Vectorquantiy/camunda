@@ -29,6 +29,7 @@ import io.camunda.zeebe.test.util.junit.AutoCloseResources;
 import io.camunda.zeebe.test.util.junit.AutoCloseResources.AutoCloseResource;
 import io.camunda.zeebe.test.util.junit.RegressionTest;
 import io.camunda.zeebe.test.util.socket.SocketUtil;
+import io.opentelemetry.api.OpenTelemetry;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.nio.file.Files;
@@ -75,7 +76,7 @@ final class NettyMessagingServiceTest {
   }
 
   private NettyMessagingService newMessagingService() {
-    return new NettyMessagingService(CLUSTER_NAME, newAddress(), defaultConfig());
+    return new NettyMessagingService(CLUSTER_NAME, newAddress(), defaultConfig(), OpenTelemetry.noop());
   }
 
   private Address newAddress() {
@@ -205,7 +206,7 @@ final class NettyMessagingServiceTest {
 
       // when
       final var nonBindableAddress = new Address("invalid.host", 1);
-      try (final var service = new NettyMessagingService("test", nonBindableAddress, config)) {
+      try (final var service = new NettyMessagingService("test", nonBindableAddress, config, OpenTelemetry.noop())) {
         // then - should not fail by using advertisedAddress for binding
         assertThat(service.start()).succeedsWithin(Duration.ofSeconds(5));
         assertThat(service.bindingAddresses()).contains(bindingAddress);

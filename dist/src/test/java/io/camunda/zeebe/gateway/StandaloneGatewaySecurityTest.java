@@ -23,6 +23,7 @@ import io.camunda.zeebe.shared.IdleStrategyConfig.IdleStrategySupplier;
 import io.camunda.zeebe.test.util.asserts.SslAssert;
 import io.camunda.zeebe.test.util.socket.SocketUtil;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
+import io.opentelemetry.api.OpenTelemetry;
 import java.io.File;
 import java.net.InetSocketAddress;
 import org.agrona.CloseHelper;
@@ -139,7 +140,7 @@ final class StandaloneGatewaySecurityTest {
     final var config = new GatewayConfiguration(gatewayCfg, new LifecycleProperties());
     final var clusterConfig = new GatewayClusterConfiguration();
     atomixCluster =
-        new GatewayClusterConfiguration().atomixCluster(clusterConfig.clusterConfig(config));
+        new GatewayClusterConfiguration().atomixCluster(clusterConfig.clusterConfig(config), OpenTelemetry.noop());
     final ActorSchedulerConfiguration actorSchedulerConfiguration =
         new ActorSchedulerConfiguration(gatewayCfg, new ActorClockConfiguration(false));
     actorScheduler = actorSchedulerConfiguration.actorScheduler(IdleStrategySupplier.ofDefault());

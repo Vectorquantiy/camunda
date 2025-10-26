@@ -26,6 +26,7 @@ import io.camunda.zeebe.scheduler.ActorScheduler;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.testing.TestConcurrencyControl;
 import io.camunda.zeebe.test.util.socket.SocketUtil;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.Collections;
 import org.junit.jupiter.api.AfterEach;
@@ -80,7 +81,8 @@ class EmbeddedGatewayServiceStepTest {
               mock(ClusterServicesImpl.class, RETURNS_DEEP_STUBS),
               mock(BrokerClient.class),
               Collections.emptyList(),
-              TEST_SHUTDOWN_TIMEOUT);
+              TEST_SHUTDOWN_TIMEOUT,
+              OpenTelemetry.noop());
 
       final var port = SocketUtil.getNextAddress().getPort();
       final var commandApiCfg = TEST_BROKER_CONFIG.getGateway().getNetwork();
@@ -149,7 +151,8 @@ class EmbeddedGatewayServiceStepTest {
               mock(ClusterServicesImpl.class, RETURNS_DEEP_STUBS),
               mock(BrokerClient.class),
               Collections.emptyList(),
-              TEST_SHUTDOWN_TIMEOUT);
+              TEST_SHUTDOWN_TIMEOUT,
+              OpenTelemetry.noop());
 
       testBrokerStartupContext.setEmbeddedGatewayService(mockEmbeddedGatewayService);
       shutdownFuture = CONCURRENCY_CONTROL.createFuture();

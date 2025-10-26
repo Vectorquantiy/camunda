@@ -16,6 +16,7 @@
  */
 package io.atomix.cluster.messaging.impl;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ final class LocalServerConnection extends AbstractServerConnection {
 
   @Override
   public void reply(
-      final long messageId, final ProtocolReply.Status status, final Optional<byte[]> payload) {
-    clientConnection.dispatch(new ProtocolReply(messageId, payload.orElse(EMPTY_PAYLOAD), status));
+      final ProtocolRequest message, final ProtocolReply.Status status, final Optional<byte[]> payload) {
+    clientConnection.dispatch(new ProtocolReply(message.id(), payload.orElse(EMPTY_PAYLOAD), status, message.metadata()));
   }
 }

@@ -20,6 +20,7 @@ import io.camunda.zeebe.gateway.impl.configuration.ClusterCfg;
 import io.camunda.zeebe.gateway.impl.configuration.GatewayCfg;
 import io.camunda.zeebe.gateway.impl.configuration.MembershipCfg;
 import io.camunda.zeebe.util.VersionUtil;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -47,8 +48,8 @@ public final class GatewayClusterConfiguration {
   }
 
   @Bean(destroyMethod = "stop")
-  public AtomixCluster atomixCluster(final ClusterConfig config) {
-    return new AtomixCluster(config, Version.from(VersionUtil.getVersion()));
+  public AtomixCluster atomixCluster(final ClusterConfig config, final OpenTelemetry openTelemetry) {
+    return new AtomixCluster(config, Version.from(VersionUtil.getVersion()), openTelemetry);
   }
 
   private MemberConfig memberConfig(final ClusterCfg cluster) {
