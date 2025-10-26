@@ -25,6 +25,7 @@ import io.camunda.zeebe.topology.state.TopologyChangeOperation.PartitionChangeOp
 import io.camunda.zeebe.topology.state.TopologyChangeOperation.PartitionChangeOperation.PartitionLeaveOperation;
 import io.camunda.zeebe.util.Either;
 import io.camunda.zeebe.util.FileUtil;
+import io.opentelemetry.api.OpenTelemetry;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -230,7 +231,7 @@ class ClusterTopologyManagementIntegrationTest {
   }
 
   private AtomixCluster createClusterNode(final Node localNode, final Collection<Node> nodes) {
-    return AtomixCluster.builder()
+    return AtomixCluster.builder(OpenTelemetry.noop())
         .withAddress(localNode.address())
         .withMemberId(localNode.id().id())
         .withMembershipProvider(new BootstrapDiscoveryProvider(nodes))

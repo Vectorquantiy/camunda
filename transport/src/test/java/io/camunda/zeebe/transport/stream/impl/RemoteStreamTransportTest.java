@@ -21,6 +21,7 @@ import io.camunda.zeebe.test.util.junit.AutoCloseResources.AutoCloseResource;
 import io.camunda.zeebe.test.util.socket.SocketUtil;
 import io.camunda.zeebe.transport.stream.api.RemoteStreamMetrics;
 import io.camunda.zeebe.transport.stream.impl.messages.StreamTopics;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -162,7 +163,7 @@ final class RemoteStreamTransportTest {
   }
 
   private AtomixCluster createClusterNode(final Node localNode, final Collection<Node> nodes) {
-    return AtomixCluster.builder()
+    return AtomixCluster.builder(OpenTelemetry.noop())
         .withAddress(localNode.address())
         .withMemberId(localNode.id().id())
         .withMembershipProvider(new BootstrapDiscoveryProvider(nodes))

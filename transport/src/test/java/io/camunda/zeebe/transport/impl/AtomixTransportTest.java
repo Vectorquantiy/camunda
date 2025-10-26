@@ -129,7 +129,7 @@ public class AtomixTransportTest {
     nodeAddressSupplier = () -> serverAddress;
 
     cluster =
-        AtomixCluster.builder()
+        AtomixCluster.builder(OpenTelemetry.noop())
             .withAddress(Address.from(serverAddress))
             .withMemberId("0")
             .withClusterId("cluster")

@@ -49,7 +49,7 @@ public class RemoteClientConnectionTest {
 
     // when
     remoteClientConnection.sendAsync(
-        new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes()));
+        new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes(), new HashMap<>()));
 
     // then
     final String expectedKey = simpleMetrics.computeKey(toAddress.toString(), "subj");
@@ -67,7 +67,7 @@ public class RemoteClientConnectionTest {
 
     // when
     remoteClientConnection.sendAndReceive(
-        new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes()));
+        new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes(), new HashMap<>()));
 
     // then
     final String expectedKey = simpleMetrics.computeKey(toAddress.toString(), "subj");
@@ -84,7 +84,7 @@ public class RemoteClientConnectionTest {
     // given
     final var responseFuture =
         remoteClientConnection.sendAndReceive(
-            new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes()));
+            new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes(), new HashMap<>()));
 
     // when
     responseFuture.complete("complete".getBytes());
@@ -106,7 +106,7 @@ public class RemoteClientConnectionTest {
     // given
     final var responseFuture =
         remoteClientConnection.sendAndReceive(
-            new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes()));
+            new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes(), new HashMap<>()));
 
     // when
     responseFuture.completeExceptionally(new RuntimeException());
@@ -128,7 +128,7 @@ public class RemoteClientConnectionTest {
     // given
     final var responseFuture =
         remoteClientConnection.sendAndReceive(
-            new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes()));
+            new ProtocolRequest(1, new Address("", 12345), "subj", "payload".getBytes(), new HashMap<>()));
 
     // when
     remoteClientConnection.close();

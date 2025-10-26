@@ -36,6 +36,7 @@ import io.camunda.zeebe.transport.stream.api.RemoteStreamer;
 import io.camunda.zeebe.transport.stream.api.StreamResponseException;
 import io.camunda.zeebe.transport.stream.impl.messages.ErrorCode;
 import io.camunda.zeebe.util.buffer.BufferUtil;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -199,7 +200,7 @@ final class StreamIntegrationTest {
   }
 
   private AtomixCluster createClusterNode(final Node localNode, final Collection<Node> nodes) {
-    return AtomixCluster.builder()
+    return AtomixCluster.builder(OpenTelemetry.noop())
         .withAddress(localNode.address())
         .withMemberId(localNode.id().id())
         .withMembershipProvider(new BootstrapDiscoveryProvider(nodes))

@@ -30,6 +30,7 @@ import io.atomix.raft.partition.RaftPartitionConfig;
 import io.atomix.raft.partition.RaftStorageConfig;
 import io.atomix.raft.partition.impl.RaftPartitionServer;
 import io.atomix.raft.zeebe.EntryValidator.NoopEntryValidator;
+import io.opentelemetry.api.OpenTelemetry;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
@@ -117,7 +118,7 @@ public class ZeebeTestNode {
   }
 
   private AtomixCluster buildCluster(final Collection<ZeebeTestNode> nodes) {
-    return AtomixCluster.builder()
+    return AtomixCluster.builder(OpenTelemetry.noop())
         .withAddress(node.address())
         .withClusterId(CLUSTER_ID)
         .withMembershipProvider(buildDiscoveryProvider(nodes))
