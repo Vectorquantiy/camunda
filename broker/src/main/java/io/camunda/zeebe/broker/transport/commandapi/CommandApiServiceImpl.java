@@ -25,6 +25,7 @@ import io.camunda.zeebe.stream.api.CommandResponseWriter;
 import io.camunda.zeebe.stream.api.records.TypedRecord;
 import io.camunda.zeebe.transport.RequestType;
 import io.camunda.zeebe.transport.ServerTransport;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.util.function.Consumer;
 import org.agrona.collections.IntHashSet;
 
@@ -43,6 +44,7 @@ public final class CommandApiServiceImpl extends Actor
       final PartitionAwareRequestLimiter limiter,
       final ActorSchedulingService scheduler,
       final QueryApiCfg queryApiCfg) {
+    super(GlobalOpenTelemetry.get());
     this.serverTransport = serverTransport;
     this.limiter = limiter;
     this.scheduler = scheduler;

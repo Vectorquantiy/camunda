@@ -12,6 +12,7 @@ import io.camunda.zeebe.backup.api.BackupStatus;
 import io.camunda.zeebe.backup.processing.state.CheckpointState;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,25 +33,25 @@ public class NoopBackupManager implements BackupManager {
   @Override
   public ActorFuture<Void> takeBackup(final long checkpointId, final long checkpointPosition) {
     LOG.warn("Attempted to take backup, but cannot take backup. {}", errorMessage);
-    return CompletableActorFuture.completedExceptionally(new Exception(errorMessage));
+    return CompletableActorFuture.completedExceptionally(new Exception(errorMessage), OpenTelemetry.noop());
   }
 
   @Override
   public ActorFuture<BackupStatus> getBackupStatus(final long checkpointId) {
     return CompletableActorFuture.completedExceptionally(
-        new UnsupportedOperationException(errorMessage));
+        new UnsupportedOperationException(errorMessage), OpenTelemetry.noop());
   }
 
   @Override
   public ActorFuture<Collection<BackupStatus>> listBackups() {
     return CompletableActorFuture.completedExceptionally(
-        new UnsupportedOperationException(errorMessage));
+        new UnsupportedOperationException(errorMessage), OpenTelemetry.noop());
   }
 
   @Override
   public ActorFuture<Void> deleteBackup(final long checkpointId) {
     return CompletableActorFuture.completedExceptionally(
-        new UnsupportedOperationException(errorMessage));
+        new UnsupportedOperationException(errorMessage), OpenTelemetry.noop());
   }
 
   @Override

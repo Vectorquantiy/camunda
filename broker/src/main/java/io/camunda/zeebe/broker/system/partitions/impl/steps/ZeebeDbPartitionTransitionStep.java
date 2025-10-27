@@ -13,6 +13,7 @@ import io.camunda.zeebe.broker.system.partitions.PartitionTransitionStep;
 import io.camunda.zeebe.db.ZeebeDb;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
+import io.opentelemetry.api.OpenTelemetry;
 
 public final class ZeebeDbPartitionTransitionStep implements PartitionTransitionStep {
 
@@ -30,7 +31,7 @@ public final class ZeebeDbPartitionTransitionStep implements PartitionTransition
         context.getStateController().closeDb();
         context.setZeebeDb(null);
       } catch (final Exception e) {
-        return CompletableActorFuture.completedExceptionally(e);
+        return CompletableActorFuture.completedExceptionally(e, OpenTelemetry.noop());
       }
     }
 

@@ -35,6 +35,7 @@ import io.camunda.zeebe.util.exception.UnrecoverableException;
 import io.camunda.zeebe.util.health.FailureListener;
 import io.camunda.zeebe.util.health.HealthMonitorable;
 import io.camunda.zeebe.util.health.HealthReport;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -86,6 +87,7 @@ public final class ExporterDirector extends Actor implements HealthMonitorable, 
   private final EventFilter positionsToSkipFilter;
 
   public ExporterDirector(final ExporterDirectorContext context, final boolean shouldPauseOnStart) {
+    super(GlobalOpenTelemetry.get());
     name = context.getName();
 
     logStream = Objects.requireNonNull(context.getLogStream());

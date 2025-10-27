@@ -16,6 +16,7 @@ import io.camunda.zeebe.transport.TransportFactory;
 import io.camunda.zeebe.transport.stream.api.ClientStream;
 import io.camunda.zeebe.transport.stream.api.ClientStreamService;
 import io.camunda.zeebe.transport.stream.api.ClientStreamer;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.Collection;
 
 /**
@@ -38,8 +39,9 @@ public final class JobStreamClientImpl implements JobStreamClient {
       final ActorSchedulingService schedulingService,
       final ClusterCommunicationService clusterCommunicationService) {
     this.schedulingService = schedulingService;
+    //TODO: fix
     streamService =
-        new TransportFactory(schedulingService)
+        new TransportFactory(schedulingService, OpenTelemetry.noop())
             .createRemoteStreamClient(clusterCommunicationService, new JobClientStreamMetrics());
   }
 

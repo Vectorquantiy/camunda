@@ -25,6 +25,7 @@ import io.camunda.zeebe.topology.state.MemberState;
 import io.camunda.zeebe.topology.state.TopologyChangeOperation;
 import io.camunda.zeebe.topology.state.TopologyChangeOperation.PartitionChangeOperation.PartitionLeaveOperation;
 import io.camunda.zeebe.util.Either;
+import io.opentelemetry.api.OpenTelemetry;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
@@ -122,7 +123,7 @@ final class ClusterTopologyManagerTest {
   void shouldFailToStartIfTopologyInitializationThrownError() {
     // given
     final TopologyInitializer failingInitializer =
-        () -> CompletableActorFuture.completedExceptionally(new RuntimeException("Expected"));
+        () -> CompletableActorFuture.completedExceptionally(new RuntimeException("Expected"), OpenTelemetry.noop());
     final var startFuture = startTopologyManager(failingInitializer);
 
     // when - then
@@ -291,7 +292,7 @@ final class ClusterTopologyManagerTest {
     public ActorFuture<UnaryOperator<MemberState>> apply() {
       if (numFailures > 0) {
         numFailures--;
-        return CompletableActorFuture.completedExceptionally(new RuntimeException("Expected"));
+        return CompletableActorFuture.completedExceptionally(new RuntimeException("Expected"), OpenTelemetry.noop());
       } else {
         return super.apply();
       }

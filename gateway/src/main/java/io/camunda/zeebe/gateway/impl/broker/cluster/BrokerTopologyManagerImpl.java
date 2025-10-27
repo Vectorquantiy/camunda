@@ -19,6 +19,7 @@ import io.camunda.zeebe.protocol.impl.encoding.BrokerInfo;
 import io.camunda.zeebe.scheduler.Actor;
 import io.camunda.zeebe.topology.TopologyUpdateNotifier.TopologyUpdateListener;
 import io.camunda.zeebe.topology.state.ClusterTopology;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -36,6 +37,8 @@ public final class BrokerTopologyManagerImpl extends Actor
   private final Set<BrokerTopologyListener> topologyListeners = new HashSet<>();
 
   public BrokerTopologyManagerImpl(final Supplier<Set<Member>> membersSupplier) {
+    //TODO: fix
+    super(OpenTelemetry.noop());
     this.membersSupplier = membersSupplier;
   }
 

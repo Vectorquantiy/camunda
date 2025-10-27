@@ -13,6 +13,7 @@ import io.camunda.zeebe.scheduler.Actor;
 import io.camunda.zeebe.scheduler.ActorControl;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.testing.ControlledActorSchedulerExtension;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -220,6 +221,11 @@ final class RetryStrategyTest {
   }
 
   private static final class ControllableActor extends Actor {
+
+    ControllableActor() {
+      super(OpenTelemetry.noop());
+    }
+
     public ActorControl getActor() {
       return actor;
     }

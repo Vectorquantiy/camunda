@@ -115,6 +115,7 @@ final class ClusterTopologyGossiperTest {
 
     private TestGossiper(
         final AtomixCluster atomixCluster, final ClusterTopologyGossiperConfig config) {
+      super(OpenTelemetry.noop());
 
       gossiper =
           new ClusterTopologyGossiper(

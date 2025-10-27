@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.camunda.zeebe.scheduler.Actor;
 import io.camunda.zeebe.scheduler.ActorThread;
 import io.camunda.zeebe.scheduler.testing.ControlledActorSchedulerRule;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -60,7 +61,7 @@ public final class RunnableActionsTest {
   public void shouldInvokeSubmitFromNonActorThread() {
     // given
     final AtomicBoolean toggle = new AtomicBoolean(false);
-    final Submitter submitter = new Submitter();
+    final Submitter submitter = new Submitter(OpenTelemetry.noop());
     scheduler.submitActor(submitter);
 
     // when
@@ -76,7 +77,7 @@ public final class RunnableActionsTest {
     // given
     final Runner runner = new Runner();
     final Actor invoker =
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             runner.doRun();
@@ -101,7 +102,7 @@ public final class RunnableActionsTest {
         new Runner(() -> actorContext.add(ActorThread.current().getCurrentTask().getActor()));
 
     final Actor invoker =
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             runner.doRun();
@@ -124,10 +125,10 @@ public final class RunnableActionsTest {
     final AtomicInteger invocations = new AtomicInteger();
     final AtomicBoolean exceptionOnSubmit = new AtomicBoolean(false);
 
-    final Submitter submitter = new Submitter();
+    final Submitter submitter = new Submitter(OpenTelemetry.noop());
 
     final Actor actor =
-        new Actor() {
+        new Actor(OpenTelemetry.noop()) {
           @Override
           protected void onActorStarted() {
             try {
@@ -150,6 +151,11 @@ public final class RunnableActionsTest {
   }
 
   private static final class Submitter extends Actor {
+
+    Submitter(final OpenTelemetry openTelemetry) {
+      super(openTelemetry);
+    }
+
     public void submit(final Runnable r) {
       actor.submit(r);
     }
@@ -164,6 +170,7 @@ public final class RunnableActionsTest {
     }
 
     Runner(final Runnable onExecution) {
+      super(OpenTelemetry.noop());
       this.onExecution = onExecution;
     }
 

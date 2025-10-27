@@ -17,6 +17,7 @@ import io.atomix.utils.net.Address;
 import io.camunda.zeebe.util.CloseableSilently;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.opentelemetry.api.OpenTelemetry;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class RemoteClientConnectionTest {
     final ChannelFuture channelFuture = mock(ChannelFuture.class);
     when(channel.writeAndFlush(any())).thenReturn(channelFuture);
     simpleMetrics = new SimpleMessagingMetrics();
-    remoteClientConnection = new RemoteClientConnection(simpleMetrics, channel);
+    remoteClientConnection = new RemoteClientConnection(simpleMetrics, channel, OpenTelemetry.noop());
   }
 
   @Test

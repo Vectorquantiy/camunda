@@ -26,6 +26,7 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ServerCallStreamObserver;
 import io.grpc.stub.StreamObserver;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.concurrent.Executor;
 import org.agrona.DirectBuffer;
 import org.slf4j.Logger;
@@ -37,6 +38,8 @@ public class StreamJobsHandler extends Actor {
   private final ClientStreamer<JobActivationProperties> jobStreamer;
 
   public StreamJobsHandler(final ClientStreamer<JobActivationProperties> jobStreamer) {
+    //TODO: fix
+    super(OpenTelemetry.noop());
     this.jobStreamer = jobStreamer;
   }
 

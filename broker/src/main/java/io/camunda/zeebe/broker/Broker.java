@@ -25,6 +25,7 @@ import io.camunda.zeebe.util.VersionUtil;
 import io.camunda.zeebe.util.exception.UncheckedExecutionException;
 import io.camunda.zeebe.util.jar.ExternalJarLoadException;
 import io.netty.util.NetUtil;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import java.util.Collections;
 import java.util.List;
@@ -207,6 +208,7 @@ public final class Broker implements AutoCloseable {
     private final int nodeId;
 
     private BrokerStartupActor(final BrokerStartupContextImpl startupContext) {
+      super(GlobalOpenTelemetry.get());
       nodeId = startupContext.getBrokerInfo().getNodeId();
       startupContext.setConcurrencyControl(actor);
       brokerStartupProcess = new BrokerStartupProcess(startupContext);

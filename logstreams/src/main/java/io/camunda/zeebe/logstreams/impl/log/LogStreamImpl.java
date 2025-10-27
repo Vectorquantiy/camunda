@@ -22,6 +22,8 @@ import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
 import io.camunda.zeebe.util.exception.UnrecoverableException;
 import io.camunda.zeebe.util.health.FailureListener;
 import io.camunda.zeebe.util.health.HealthReport;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -59,6 +61,7 @@ public final class LogStreamImpl extends Actor
       final int nodeId,
       final int maxFragmentSize,
       final LogStorage logStorage) {
+    super(GlobalOpenTelemetry.get());
     this.actorSchedulingService = actorSchedulingService;
     this.logName = logName;
 
@@ -188,7 +191,8 @@ public final class LogStreamImpl extends Actor
   private ActorFuture<LogStreamWriter> createNewLogStreamWriter() {
     // this should be replaced after refactoring the actor control
     if (actor.isClosed()) {
-      return CompletableActorFuture.completedExceptionally(new RuntimeException("Actor is closed"));
+      //TODO: check
+      return CompletableActorFuture.completedExceptionally(new RuntimeException("Actor is closed"), GlobalOpenTelemetry.get());
     }
 
     final var writerFuture = new CompletableActorFuture<LogStreamWriter>();

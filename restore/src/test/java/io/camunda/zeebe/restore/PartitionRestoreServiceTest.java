@@ -30,6 +30,7 @@ import io.camunda.zeebe.snapshots.SnapshotException.CorruptedSnapshotException;
 import io.camunda.zeebe.snapshots.impl.FileBasedSnapshotStore;
 import io.camunda.zeebe.util.FileUtil;
 import io.camunda.zeebe.util.buffer.DirectBufferWriter;
+import io.opentelemetry.api.OpenTelemetry;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -109,7 +110,8 @@ class PartitionRestoreServiceTest {
             snapshotStore,
             dataDirectory,
             // RaftPartitions implements this interface, but the RaftServer is not started
-            index -> CompletableFuture.completedFuture(journal.getTailSegments(index).values()));
+            index -> CompletableFuture.completedFuture(journal.getTailSegments(index).values()),
+            OpenTelemetry.noop());
     actorScheduler.submitActor(backupService);
   }
 

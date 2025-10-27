@@ -18,6 +18,7 @@ import io.camunda.zeebe.topology.state.TopologyChangeOperation.PartitionChangeOp
 import io.camunda.zeebe.topology.state.TopologyChangeOperation.PartitionChangeOperation.PartitionLeaveOperation;
 import io.camunda.zeebe.topology.state.TopologyChangeOperation.PartitionChangeOperation.PartitionReconfigurePriorityOperation;
 import io.camunda.zeebe.util.Either;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.function.UnaryOperator;
 
 public class TopologyChangeAppliersImpl implements TopologyChangeAppliers {
@@ -78,7 +79,7 @@ public class TopologyChangeAppliersImpl implements TopologyChangeAppliers {
     @Override
     public ActorFuture<UnaryOperator<MemberState>> apply() {
       return CompletableActorFuture.completedExceptionally(
-          new UnknownOperationException(operation));
+          new UnknownOperationException(operation), OpenTelemetry.noop());
     }
 
     private static class UnknownOperationException extends RuntimeException {

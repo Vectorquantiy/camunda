@@ -20,6 +20,7 @@ import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.transport.TransportFactory;
 import io.camunda.zeebe.transport.stream.api.RemoteStreamService;
 import io.camunda.zeebe.util.VisibleForTesting;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.Collection;
 import org.agrona.DirectBuffer;
 import org.agrona.MutableDirectBuffer;
@@ -41,7 +42,8 @@ public final class JobStreamServiceStep extends AbstractBrokerStartupStep {
 
     final var scheduler = brokerStartupContext.getActorSchedulingService();
     final RemoteStreamService<JobActivationProperties, ActivatedJob> remoteStreamService =
-        new TransportFactory(scheduler)
+        //TODO: fix
+        new TransportFactory(scheduler, OpenTelemetry.noop())
             .createRemoteStreamServer(
                 clusterServices.getCommunicationService(),
                 JobStreamServiceStep::readJobActivationProperties,

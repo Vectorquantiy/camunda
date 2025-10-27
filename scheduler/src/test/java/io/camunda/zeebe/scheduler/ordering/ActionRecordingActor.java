@@ -9,6 +9,7 @@ package io.camunda.zeebe.scheduler.ordering;
 
 import io.camunda.zeebe.scheduler.Actor;
 import io.camunda.zeebe.scheduler.ActorControl;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -16,6 +17,11 @@ import java.util.function.BiConsumer;
 
 public class ActionRecordingActor extends Actor {
   public final List<String> actions = new ArrayList<>();
+
+  //TODO: fix
+  public ActionRecordingActor() {
+    super(OpenTelemetry.noop());
+  }
 
   protected BiConsumer<Void, Throwable> futureConsumer(final String label) {
     return (v, t) -> {

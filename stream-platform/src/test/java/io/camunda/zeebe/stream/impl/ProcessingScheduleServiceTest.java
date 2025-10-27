@@ -36,6 +36,7 @@ import io.camunda.zeebe.stream.impl.records.RecordBatch;
 import io.camunda.zeebe.stream.util.Records;
 import io.camunda.zeebe.test.util.junit.RegressionTest;
 import io.camunda.zeebe.util.Either;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -172,7 +173,7 @@ class ProcessingScheduleServiceTest {
   void shouldFailActorIfWriterCantBeRetrieved() {
     // given
     writerAsyncSupplier.writerFutureRef.set(
-        CompletableActorFuture.completedExceptionally(new RuntimeException("expected")));
+        CompletableActorFuture.completedExceptionally(new RuntimeException("expected"), OpenTelemetry.noop()));
     final var notOpenScheduleService =
         new TestScheduleServiceActorDecorator(
             new ProcessingScheduleServiceImpl(
@@ -394,6 +395,7 @@ class ProcessingScheduleServiceTest {
 
     public TestScheduleServiceActorDecorator(
         final ProcessingScheduleServiceImpl processingScheduleService) {
+      super(OpenTelemetry.noop());
       this.processingScheduleService = processingScheduleService;
     }
 

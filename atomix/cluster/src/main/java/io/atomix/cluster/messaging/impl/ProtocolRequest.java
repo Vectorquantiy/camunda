@@ -53,6 +53,7 @@ public final class ProtocolRequest extends ProtocolMessage {
         .add("subject", subject)
         .add("sender", sender)
         .add("payload", ArraySizeHashPrinter.of(payload()))
+        .add("metadata", metadata())
         .toString();
   }
 }

@@ -12,6 +12,7 @@ import static io.camunda.zeebe.scheduler.future.CompletableActorFuture.completed
 import io.camunda.zeebe.scheduler.ConcurrencyControl;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.startup.StartupStep;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.function.BiConsumer;
 
 abstract class AbstractBrokerStartupStep implements StartupStep<BrokerStartupContext> {
@@ -58,7 +59,7 @@ abstract class AbstractBrokerStartupStep implements StartupStep<BrokerStartupCon
       forwardExceptions(() -> runnable.accept(concurrencyControl, future), future);
       return future;
     } catch (final Exception e) {
-      return completedExceptionally(e);
+      return completedExceptionally(e, OpenTelemetry.noop());
     }
   }
 

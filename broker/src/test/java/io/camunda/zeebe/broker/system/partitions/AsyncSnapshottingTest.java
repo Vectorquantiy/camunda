@@ -27,6 +27,7 @@ import io.camunda.zeebe.snapshots.PersistedSnapshot;
 import io.camunda.zeebe.snapshots.impl.FileBasedSnapshotStore;
 import io.camunda.zeebe.stream.impl.StreamProcessor;
 import io.camunda.zeebe.test.util.AutoCloseableRule;
+import io.opentelemetry.api.OpenTelemetry;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
@@ -174,7 +175,7 @@ public final class AsyncSnapshottingTest {
         .thenReturn(CompletableActorFuture.completed(lastProcessedPosition));
     final var initialFailure = new RuntimeException("getLastWrittenPositionAsync fails");
     when(mockStreamProcessor.getLastWrittenPositionAsync())
-        .thenReturn(CompletableActorFuture.completedExceptionally(initialFailure));
+        .thenReturn(CompletableActorFuture.completedExceptionally(initialFailure, OpenTelemetry.noop()));
     setCommitPosition(commitPosition);
     assertThatThrownBy(() -> asyncSnapshotDirector.forceSnapshot().join()).hasCause(initialFailure);
     verify(mockStreamProcessor, timeout(10000).times(1)).getLastWrittenPositionAsync();
@@ -199,7 +200,7 @@ public final class AsyncSnapshottingTest {
 
     final var initialFailure = new RuntimeException("getLastProcessedPositionAsync fails");
     when(mockStreamProcessor.getLastProcessedPositionAsync())
-        .thenReturn(CompletableActorFuture.completedExceptionally(initialFailure));
+        .thenReturn(CompletableActorFuture.completedExceptionally(initialFailure, OpenTelemetry.noop()));
     when(mockStreamProcessor.getLastWrittenPositionAsync())
         .thenReturn(CompletableActorFuture.completed(lastWrittenPosition));
 

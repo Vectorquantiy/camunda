@@ -18,6 +18,7 @@ import io.camunda.zeebe.test.util.asserts.EitherAssert;
 import io.camunda.zeebe.topology.state.ClusterTopology;
 import io.camunda.zeebe.topology.state.MemberState;
 import io.camunda.zeebe.topology.state.PartitionState;
+import io.opentelemetry.api.OpenTelemetry;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -33,7 +34,7 @@ class PartitionReconfigurePriorityApplierTest {
   static void init() {
     when(FAILING_EXECUTOR.reconfigurePriority(anyInt(), anyInt()))
         .thenReturn(
-            CompletableActorFuture.completedExceptionally(new RuntimeException("force failed")));
+            CompletableActorFuture.completedExceptionally(new RuntimeException("force failed"), OpenTelemetry.noop()));
   }
 
   @Test

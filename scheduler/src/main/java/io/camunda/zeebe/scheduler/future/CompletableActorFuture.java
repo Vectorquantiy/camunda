@@ -14,6 +14,8 @@ import io.camunda.zeebe.scheduler.ActorTask;
 import io.camunda.zeebe.scheduler.ActorThread;
 import io.camunda.zeebe.scheduler.FutureUtil;
 import io.camunda.zeebe.util.Loggers;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -56,21 +58,25 @@ public final class CompletableActorFuture<V> implements ActorFuture<V> {
   private final ReentrantLock completionLock = new ReentrantLock();
   private volatile int state = CLOSED;
   private Condition isDoneCondition;
+  private final OpenTelemetry openTelemetry;
 
   public CompletableActorFuture() {
     setAwaitingResult();
+    openTelemetry = GlobalOpenTelemetry.get();
   }
 
   private CompletableActorFuture(final V value) {
     this.value = value;
     state = COMPLETED;
+    openTelemetry = GlobalOpenTelemetry.get();
   }
 
-  private CompletableActorFuture(final Throwable throwable) {
+  private CompletableActorFuture(final Throwable throwable, final OpenTelemetry openTelemetry) {
     ensureValidThrowable(throwable);
     failure = throwable.getMessage();
     failureCause = throwable;
     state = COMPLETED_EXCEPTIONALLY;
+    this.openTelemetry = openTelemetry;
   }
 
   private void ensureValidThrowable(final Throwable throwable) {
@@ -88,8 +94,8 @@ public final class CompletableActorFuture<V> implements ActorFuture<V> {
     return new CompletableActorFuture<>(result); // cast for null result
   }
 
-  public static <V> CompletableActorFuture<V> completedExceptionally(final Throwable throwable) {
-    return new CompletableActorFuture<>(throwable);
+  public static <V> CompletableActorFuture<V> completedExceptionally(final Throwable throwable, final OpenTelemetry openTelemetry) {
+    return new CompletableActorFuture<>(throwable, openTelemetry);
   }
 
   @Override
@@ -216,7 +222,7 @@ public final class CompletableActorFuture<V> implements ActorFuture<V> {
   @Override
   public void onComplete(final BiConsumer<V, Throwable> consumer) {
     if (ActorThread.isCalledFromActorThread()) {
-      final ActorControl actorControl = ActorControl.current();
+      final ActorControl actorControl = ActorControl.current(openTelemetry);
       actorControl.runOnCompletion(this, consumer);
     } else {
       // We don't reject this because, this is useful for tests. But the warning is a reminder not

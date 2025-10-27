@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import io.camunda.zeebe.broker.system.monitoring.BrokerStepMetrics;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.startup.StartupStep;
+import io.opentelemetry.api.OpenTelemetry;
 import io.prometheus.client.Gauge.Timer;
 import java.util.function.Function;
 
@@ -64,7 +65,7 @@ final class BrokerStepMetricDecorator implements StartupStep<BrokerStartupContex
 
       return future;
     } catch (final Exception e) {
-      return completedExceptionally(e);
+      return completedExceptionally(e, OpenTelemetry.noop());
     }
   }
 }

@@ -24,6 +24,7 @@ import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
 import io.camunda.zeebe.util.health.FailureListener;
 import io.camunda.zeebe.util.health.HealthMonitorable;
 import io.camunda.zeebe.util.health.HealthReport;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +49,7 @@ final class LogStorageAppender extends Actor implements HealthMonitorable, Appen
       final int partitionId,
       final LogStorage logStorage,
       final Sequencer sequencer) {
+    super(GlobalOpenTelemetry.get());
     this.name = name;
     this.partitionId = partitionId;
     this.logStorage = logStorage;

@@ -135,7 +135,7 @@ public class AtomixTransportTest {
             .withClusterId("cluster")
             .build();
     cluster.start().join();
-    transportFactory = new TransportFactory(SCHEDULER_RULE.get());
+    transportFactory = new TransportFactory(SCHEDULER_RULE.get(), OpenTelemetry.noop());
   }
 
   @Before

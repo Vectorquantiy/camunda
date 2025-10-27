@@ -16,6 +16,7 @@ import io.camunda.zeebe.engine.state.migration.DbMigratorImpl;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
 import io.camunda.zeebe.stream.impl.state.DbKeyGenerator;
+import io.opentelemetry.api.OpenTelemetry;
 
 public class MigrationTransitionStep implements PartitionTransitionStep {
 
@@ -52,7 +53,7 @@ public class MigrationTransitionStep implements PartitionTransitionStep {
       dbMigrator.runMigrations();
       zeebeDbContext.getCurrentTransaction().commit();
     } catch (final Exception e) {
-      return CompletableActorFuture.completedExceptionally(e);
+      return CompletableActorFuture.completedExceptionally(e, OpenTelemetry.noop());
     }
     return CompletableActorFuture.completed(null);
   }

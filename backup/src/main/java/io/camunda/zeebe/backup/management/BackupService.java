@@ -18,6 +18,7 @@ import io.camunda.zeebe.scheduler.Actor;
 import io.camunda.zeebe.scheduler.future.ActorFuture;
 import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
 import io.camunda.zeebe.snapshots.PersistedSnapshotStore;
+import io.opentelemetry.api.OpenTelemetry;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;
@@ -44,7 +45,9 @@ public final class BackupService extends Actor implements BackupManager {
       final BackupStore backupStore,
       final PersistedSnapshotStore snapshotStore,
       final Path segmentsDirectory,
-      final JournalInfoProvider raftMetadataProvider) {
+      final JournalInfoProvider raftMetadataProvider,
+      final OpenTelemetry openTelemetry) {
+    super(openTelemetry);
     this.nodeId = nodeId;
     this.partitionId = partitionId;
     this.numberOfPartitions = numberOfPartitions;

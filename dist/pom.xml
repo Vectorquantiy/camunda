@@ -337,6 +337,7 @@
           <extraJvmArguments>-XX:+ExitOnOutOfMemoryError
             -Dfile.encoding=UTF-8 -Xshare:auto
             -Dfile.encoding=UTF-8
+            -Dotel.java.global-autoconfigure.enabled=true
             -javaagent:$ZB_HOME/lib/opentelemetry-javaagent-${version.opentelemetry}.jar
           </extraJvmArguments>
           <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>

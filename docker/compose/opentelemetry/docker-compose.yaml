@@ -27,6 +27,7 @@ services:
       - OTEL_METRICS_EXPORTER=none
       - OTEL_LOGS_EXPORTER=none
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://opentelemetry-collector:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
   broker-1:
     image: camunda/zeebe:${ZEEBE_VERSION:-otel-integration}
     environment:
@@ -46,6 +47,7 @@ services:
       - OTEL_METRICS_EXPORTER=none
       - OTEL_LOGS_EXPORTER=none
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://opentelemetry-collector:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
     volumes:
       - broker_1:/usr/local/zeebe/data
     ports:

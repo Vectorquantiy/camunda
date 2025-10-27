@@ -696,7 +696,7 @@ public final class NettyMessagingService implements ManagedMessagingService {
     if (connection == null) {
       connection =
           connections.computeIfAbsent(
-              channel, c -> new RemoteClientConnection(messagingMetrics, c));
+              channel, c -> new RemoteClientConnection(messagingMetrics, c, openTelemetry));
       channel
           .closeFuture()
           .addListener(

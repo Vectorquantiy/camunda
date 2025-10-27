@@ -19,6 +19,8 @@ import io.camunda.zeebe.scheduler.ActorControl;
 import io.camunda.zeebe.scheduler.ActorScheduler;
 import io.camunda.zeebe.util.CloseableSilently;
 import io.camunda.zeebe.util.jar.ExternalJarLoadException;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.OpenTelemetry;
 import java.io.File;
 import java.nio.file.Path;
 import org.agrona.CloseHelper;
@@ -88,6 +90,12 @@ public final class ExporterContainerRuntime implements CloseableSilently {
   }
 
   static final class RuntimeActor extends Actor {
+
+    RuntimeActor() {
+      //TODO: check
+      super(OpenTelemetry.noop());
+    }
+
     ActorControl getActorControl() {
       return actor;
     }

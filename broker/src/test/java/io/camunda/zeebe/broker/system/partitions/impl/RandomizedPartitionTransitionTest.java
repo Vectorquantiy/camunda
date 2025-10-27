@@ -33,6 +33,7 @@ import io.camunda.zeebe.scheduler.future.CompletableActorFuture;
 import io.camunda.zeebe.snapshots.TransientSnapshot;
 import io.camunda.zeebe.stream.impl.StreamProcessor;
 import io.camunda.zeebe.util.health.HealthMonitor;
+import io.opentelemetry.api.OpenTelemetry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -428,6 +429,10 @@ public class RandomizedPartitionTransitionTest {
   }
 
   private static final class TestActor extends Actor {
+
+    TestActor() {
+      super(OpenTelemetry.noop());
+    }
 
     @Override
     public String getName() {
