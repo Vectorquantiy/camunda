@@ -50,6 +50,10 @@ import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.epoll.EpollSocketChannel;
+import io.netty.channel.kqueue.KQueue;
+import io.netty.channel.kqueue.KQueueEventLoopGroup;
+import io.netty.channel.kqueue.KQueueServerSocketChannel;
+import io.netty.channel.kqueue.KQueueSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.SocketChannel;
@@ -517,7 +521,9 @@ public final class NettyMessagingService implements ManagedMessagingService {
   }
 
   private void initTransport() {
-    if (Epoll.isAvailable()) {
+    if (KQueue.isAvailable()) {
+      initKQueueTransport();
+    } else if (Epoll.isAvailable()) {
       initEpollTransport();
     } else {
       initNioTransport();
@@ -542,6 +548,15 @@ public final class NettyMessagingService implements ManagedMessagingService {
     serverChannelClass = NioServerSocketChannel.class;
     clientChannelClass = NioSocketChannel.class;
     clientDataGramChannelClass = NioDatagramChannel.class;
+  }
+
+  private void initKQueueTransport() {
+    clientGroup =
+        new KQueueEventLoopGroup(0, namedThreads("netty-messaging-event-kqueue-client-%d", log));
+    serverGroup =
+        new KQueueEventLoopGroup(0, namedThreads("netty-messaging-event-kqueue-server-%d", log));
+    serverChannelClass = KQueueServerSocketChannel.class;
+    clientChannelClass = KQueueSocketChannel.class;
   }
 
   /**
